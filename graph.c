@@ -41,6 +41,10 @@ int get_vertex_degree(int vertex, int* adj_matrix, int order) {
     return vertex_degree;
 }
 
+int get_graph_order(struct Graph* G) {
+    return G->order;
+}
+
 /*  Função graph_from_file()
     Realiza a leitura do arquivo de caminho path e preenche a estrutura Graph,
     cujo endereço é dado pelo ponteiro G.
@@ -177,6 +181,8 @@ void main() {
 
     struct Graph* G = malloc(sizeof(struct Graph));
     graph_from_file(G, "G.graph");
+
+    printf("Graph order: %d\n", get_graph_order(G));
 
     free(G->V);
     free(G->ADJ_MATRIX);
