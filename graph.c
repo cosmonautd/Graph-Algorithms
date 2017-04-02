@@ -150,7 +150,7 @@ int graph_from_file(struct Graph* G, const char* path) {
     free(adj_matrix);
 
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
-    for(int i=0; i < G->order; i++) {
+    for(i=0; i < G->order; i++) {
         int vertex_degree = get_vertex_degree(i, G->ADJ_MATRIX, G->order);
         G->ADJ_LISTS[i] = malloc(vertex_degree * sizeof(int));
         for(j=0, k=0; j < G->order && k < vertex_degree; j++)
