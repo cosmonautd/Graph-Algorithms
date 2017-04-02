@@ -20,6 +20,7 @@ struct Graph {
     int* ADJ_MATRIX;
     int** ADJ_LISTS;
     int order;
+    int directed;
 };
 
 /*  Função get_index()
@@ -43,6 +44,10 @@ int get_vertex_degree(int vertex, int* adj_matrix, int order) {
 
 int get_graph_order(struct Graph* G) {
     return G->order;
+}
+
+int is_directed(struct Graph* G) {
+    return G->directed;
 }
 
 /*  Função graph_from_file()
@@ -173,6 +178,17 @@ int graph_from_file(struct Graph* G, const char* path) {
         for(j=0; j < vertex_degree; j++) DEBUG_MESSAGE(("%d ", G->ADJ_LISTS[i][j]));
         DEBUG_MESSAGE(("\n"));
     }
+    DEBUG_MESSAGE(("\n"));
+
+    DEBUG_MESSAGE(("Checking directness...\n"));
+    int symmetric = 1;
+    for(i=0; i < G->order && symmetric; i++) {
+        for(j==i+1; j < G->order && symmetric; j++)
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)]) {
+                G->directed = 1;
+                symmetric = 0;
+            }
+    }
 }
 
 void main() {
@@ -181,6 +197,9 @@ void main() {
 
     struct Graph* G = malloc(sizeof(struct Graph));
     graph_from_file(G, "G.graph");
+
+    if(is_directed(G)) printf("\nDirected Graph\n");
+    else printf("\nUndirected Graph\n");
 
     printf("Graph order: %d\n", get_graph_order(G));
 
