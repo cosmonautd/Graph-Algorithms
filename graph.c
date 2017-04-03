@@ -70,8 +70,28 @@ void dfs(struct Graph* G, int v, int* aux, int depth) {
     }
 }
 
-void bfs(struct Graph* G, int v, int* aux, int depth) {
+void bfs(struct Graph* G, int v, int* aux) {
 
+    int* Q = calloc(G->order, sizeof(int));
+    int Q_start = 0;
+    int Q_end = 0;
+
+    aux[v] = 1;
+    DEBUG_MESSAGE(("Visiting vertex %d\n", v));
+    Q[Q_end++] = v;
+
+    while(Q_start < Q_end) {
+        v = Q[Q_start++];
+        int j;
+        for(j=0; j < get_vertex_degree(v, G->ADJ_MATRIX, G->order); j++) {
+            int w = G->ADJ_LISTS[v][j];
+            if(aux[w] == 0) {
+                Q[Q_end++] = w;
+                aux[w] = 1;
+                DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+            }
+        }
+    }
 }
 
 int is_connected(struct Graph* G, int algorithm) {
@@ -96,6 +116,19 @@ int is_connected(struct Graph* G, int algorithm) {
 
     } else if(algorithm = BREADTH_FIRST) {
 
+        if(!is_directed(G)) {
+            int* aux = calloc(G->order, sizeof(int));
+            bfs(G, 0, aux);
+            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
+            return 1;
+        } else {
+            for(i=0; i < G->order; i++) {
+                int* aux = calloc(G->order, sizeof(int));
+                bfs(G, i, aux);
+                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
+            }
+            return 1;
+        }
     }
 }
 
@@ -250,7 +283,9 @@ void main() {
     else printf("\nUndirected Graph\n");
 
     printf("\n");
-    if(is_connected(G, DEPTH_FIRST)) printf("\nConnected\n");
+    //if(is_connected(G, DEPTH_FIRST))
+    if(is_connected(G, BREADTH_FIRST))
+        printf("\nConnected\n");
     else printf("\nNot Connected\n");
 
     printf("Graph order: %d\n", get_graph_order(G));
