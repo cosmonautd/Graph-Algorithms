@@ -29,7 +29,7 @@ struct Graph {
     como um vetor unidimensional.
 */
 int get_index(int i, int j, int rowsize) {
-    return i + j*rowsize;
+    return j + i*rowsize;
 }
 
 int get_vertex_degree(int vertex, int* adj_matrix, int order) {
