@@ -10,6 +10,9 @@
     #define DEBUG_MESSAGE(x) ;
 #endif
 
+#define DEPTH_FIRST 0
+#define BREADTH_FIRST 1
+
 /*  Estrutura Grafo
     V: vértices
     ADJ_MATRIX: matriz de adjacência
@@ -48,6 +51,52 @@ int get_graph_order(struct Graph* G) {
 
 int is_directed(struct Graph* G) {
     return G->directed;
+}
+
+void dfs(struct Graph* G, int v, int* aux, int depth) {
+
+    if(depth == 0) {
+        dfs(G, v, aux, ++depth);
+
+    } else {
+        aux[v] = 1;
+        DEBUG_MESSAGE(("Visiting vertex %d\n", v));
+        int j;
+        for(j=0; j < get_vertex_degree(v, G->ADJ_MATRIX, G->order); j++) {
+            int w = G->ADJ_LISTS[v][j];
+            if(aux[w] == 0)
+                dfs(G, w, aux, depth++);
+        }
+    }
+}
+
+void bfs(struct Graph* G, int v, int* aux, int depth) {
+
+}
+
+int is_connected(struct Graph* G, int algorithm) {
+
+    int i, j;
+
+    if(algorithm == DEPTH_FIRST) {
+
+        if(!is_directed(G)) {
+            int* aux = calloc(G->order, sizeof(int));
+            dfs(G, 0, aux, 0);
+            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
+            return 1;
+        } else {
+            for(i=0; i < G->order; i++) {
+                int* aux = calloc(G->order, sizeof(int));
+                dfs(G, i, aux, 0);
+                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
+            }
+            return 1;
+        }
+
+    } else if(algorithm = BREADTH_FIRST) {
+
+    }
 }
 
 /*  Função graph_from_file()
@@ -199,6 +248,10 @@ void main() {
 
     if(is_directed(G)) printf("\nDirected Graph\n");
     else printf("\nUndirected Graph\n");
+
+    printf("\n");
+    if(is_connected(G, DEPTH_FIRST)) printf("\nConnected\n");
+    else printf("\nNot Connected\n");
 
     printf("Graph order: %d\n", get_graph_order(G));
 
