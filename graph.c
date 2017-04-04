@@ -61,6 +61,7 @@ int is_directed(struct Graph* G) {
 void dfs(struct Graph* G, int v, int* aux, int depth) {
 
     if(depth == 0) {
+        DEBUG_MESSAGE(("\nExecuting Depth First Traversal from vertex %d\n", v));
         dfs(G, v, aux, ++depth);
 
     } else {
@@ -80,6 +81,8 @@ void bfs(struct Graph* G, int v, int* aux) {
     int* Q = calloc(G->order, sizeof(int));
     int Q_start = 0;
     int Q_end = 0;
+
+    DEBUG_MESSAGE(("\nExecuting Breadth First Traversal from vertex %d\n", v));
 
     aux[v] = 1;
     DEBUG_MESSAGE(("Visiting vertex %d\n", v));
