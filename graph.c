@@ -36,11 +36,11 @@ int get_index(int i, int j, int rowsize) {
     return j + i*rowsize;
 }
 
-int get_vertex_degree(int vertex, int* adj_matrix, int order) {
+int get_vertex_degree(int vertex, struct Graph* G) {
     int j;
     int vertex_degree = 0;
-    for(j=0; j < order; j++)
-        if(adj_matrix[get_index(vertex, j, order)] > 0 && j != vertex)
+    for(j=0; j < G->order; j++)
+        if(G->ADJ_MATRIX[get_index(vertex, j, order)] > 0 && j != vertex)
             vertex_degree++;
 
     return vertex_degree;
@@ -68,7 +68,7 @@ void dfs(struct Graph* G, int v, int* aux, int depth) {
         aux[v] = 1;
         DEBUG_MESSAGE(("Visiting vertex %d\n", v));
         int j;
-        for(j=0; j < get_vertex_degree(v, G->ADJ_MATRIX, G->order); j++) {
+        for(j=0; j < get_vertex_degree(v, G); j++) {
             int w = G->ADJ_LISTS[v][j];
             if(aux[w] == 0)
                 dfs(G, w, aux, depth++);
@@ -91,7 +91,7 @@ void bfs(struct Graph* G, int v, int* aux) {
     while(Q_start < Q_end) {
         v = Q[Q_start++];
         int j;
-        for(j=0; j < get_vertex_degree(v, G->ADJ_MATRIX, G->order); j++) {
+        for(j=0; j < get_vertex_degree(v, G); j++) {
             int w = G->ADJ_LISTS[v][j];
             if(aux[w] == 0) {
                 Q[Q_end++] = w;
@@ -252,7 +252,7 @@ int graph_from_file(struct Graph* G, const char* path) {
 
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
     for(i=0; i < G->order; i++) {
-        int vertex_degree = get_vertex_degree(i, G->ADJ_MATRIX, G->order);
+        int vertex_degree = get_vertex_degree(i, G);
         G->ADJ_LISTS[i] = malloc(vertex_degree * sizeof(int));
         for(j=0, k=0; j < G->order && k < vertex_degree; j++)
             if(G->ADJ_MATRIX[get_index(i, j, G->order)] > 0 && i != j) {
@@ -275,7 +275,7 @@ int graph_from_file(struct Graph* G, const char* path) {
     DEBUG_MESSAGE(("Generated Adjacency Lists:\n\n"));
     for(i=0; i < G->order; i++) {
         DEBUG_MESSAGE(("Vertex %d: ", i));
-        int vertex_degree = get_vertex_degree(i, G->ADJ_MATRIX, G->order);
+        int vertex_degree = get_vertex_degree(i, G);
         for(j=0; j < vertex_degree; j++) DEBUG_MESSAGE(("%d ", G->ADJ_LISTS[i][j]));
         DEBUG_MESSAGE(("\n"));
     }
