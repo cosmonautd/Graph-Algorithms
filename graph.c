@@ -137,6 +137,10 @@ int is_connected(struct Graph* G, int algorithm) {
     }
 }
 
+int is_tree(struct Graph* G) {
+    return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
+}
+
 /*  Função graph_from_file()
     Realiza a leitura do arquivo de caminho path e preenche a estrutura Graph,
     cujo endereço é dado pelo ponteiro G.
@@ -294,13 +298,15 @@ void main() {
     if(is_directed(G)) printf("\nDirected Graph\n");
     else printf("\nUndirected Graph\n");
 
-    printf("\n");
     //if(is_connected(G, DEPTH_FIRST))
     if(is_connected(G, BREADTH_FIRST))
         printf("\nConnected\n");
     else printf("\nNot Connected\n");
 
+    if(is_tree(G)) printf("\nTree\n");
+
     printf("Graph order: %d\n", get_graph_order(G));
+    printf("Graph size: %d\n", get_graph_size(G));
 
     free(G->V);
     free(G->ADJ_MATRIX);
