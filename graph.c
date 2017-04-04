@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*  Define se o programa é compilado com impressão de linhas de debug
+*/
 #define DEBUG
 
 #ifdef DEBUG
@@ -10,13 +12,18 @@
     #define DEBUG_MESSAGE(x) ;
 #endif
 
+/*  Macros para escolha de algoritmos de busca em profundidade ou largura
+*/
 #define DEPTH_FIRST 0
 #define BREADTH_FIRST 1
 
 /*  Estrutura Grafo
     V: vértices
     ADJ_MATRIX: matriz de adjacência
-    order: ordem do grafo
+    ADJ_LISTS: listas de adjacência
+    order: ordem do grafo (número de vértices)
+    size: tamanho do grafo (número de arestas)
+    directed: indica se o grafo é orientado (1) ou não (0)
 */
 struct Graph {
     int* V;
@@ -36,6 +43,11 @@ int get_index(int i, int j, int rowsize) {
     return j + i*rowsize;
 }
 
+/*  Função get_vertex_degree()
+    Retorna o grau de um vértice v no grafo G. O cálculo é feito através da
+    contagem de elementos positivos na linha da matriz de adjacência que
+    representa o vértice v.
+*/
 int get_vertex_degree(int vertex, struct Graph* G) {
     int j;
     int vertex_degree = 0;
@@ -46,18 +58,35 @@ int get_vertex_degree(int vertex, struct Graph* G) {
     return vertex_degree;
 }
 
+/*  Função get_graph_order()
+    Retorna a ordem do grafo G.
+*/
 int get_graph_order(struct Graph* G) {
     return G->order;
 }
 
+/*  Função get_graph_size()
+    Retorna o tamanho do grafo G.
+*/
 int get_graph_size(struct Graph* G) {
     return G->size;
 }
 
+/*  Função is_directed()
+    Retorna 1 se o grafo é orientado, 0 se é não-orientado.
+*/
 int is_directed(struct Graph* G) {
     return G->directed;
 }
 
+/*  Função dfs()
+    Realiza uma busca em profundidade no grafo G, a partir do vértice v.
+    A entrada aux deve ser um vetor de comprimento igual à ordem de G.
+    A váriavel depth indica a profundidade atual durante a busca.
+    Ao fim da busca, os vértices alcançáveis a partir de v são indicados no
+    vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
+    é alcançável, e 0 caso contrário.
+*/
 void dfs(struct Graph* G, int v, int* aux, int depth) {
 
     if(depth == 0) {
@@ -76,6 +105,13 @@ void dfs(struct Graph* G, int v, int* aux, int depth) {
     }
 }
 
+/*  Função bfs()
+    Realiza uma busca em largura no grafo G, a partir do vértice v.
+    A entrada aux deve ser um vetor de comprimento igual à ordem de G.
+    Ao fim da busca, os vértices alcançáveis a partir de v são indicados no
+    vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
+    é alcançável, e 0 caso contrário.
+*/
 void bfs(struct Graph* G, int v, int* aux) {
 
     int* Q = calloc(G->order, sizeof(int));
@@ -102,6 +138,14 @@ void bfs(struct Graph* G, int v, int* aux) {
     }
 }
 
+/*  Função is_connected()
+    TLDR: Verifica se G é fortemente conexo.
+    Testa se o grafo G é conexo, utilizando o algoritmo indicado (DEPTH_FIRST
+    ou BREADTH_FIRST). Caso o grafo seja não-orientado, realiza uma busca a
+    partir do vértice 0 e verifica se todos os vértices são alcançáveis. caso
+    o grafo seja orientado, realiza uma busca para cada vértice de G e verifica
+    se ao final de cada busca, todos os vértices são alcançáveis.
+*/
 int is_connected(struct Graph* G, int algorithm) {
 
     int i, j;
@@ -140,6 +184,9 @@ int is_connected(struct Graph* G, int algorithm) {
     }
 }
 
+/*  Função is_tree()
+    Verifica se o grafo é uma árvore.
+*/
 int is_tree(struct Graph* G) {
     return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
 }
