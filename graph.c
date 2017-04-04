@@ -23,6 +23,7 @@ struct Graph {
     int* ADJ_MATRIX;
     int** ADJ_LISTS;
     int order;
+    int size;
     int directed;
 };
 
@@ -47,6 +48,10 @@ int get_vertex_degree(int vertex, int* adj_matrix, int order) {
 
 int get_graph_order(struct Graph* G) {
     return G->order;
+}
+
+int get_graph_size(struct Graph* G) {
+    return G->size;
 }
 
 int is_directed(struct Graph* G) {
@@ -212,6 +217,7 @@ int graph_from_file(struct Graph* G, const char* path) {
     G->ADJ_MATRIX = malloc(n_vertices * n_vertices * sizeof(int));
     G->ADJ_LISTS = malloc(n_vertices * sizeof(int*));
     G->order = n_vertices;
+    G->size = 0;
 
     DEBUG_MESSAGE(("Generating Vertices...\n"));
     tokenize = strtok(vertices_list, ", ");
@@ -230,6 +236,12 @@ int graph_from_file(struct Graph* G, const char* path) {
     }
 
     free(adj_matrix);
+
+    DEBUG_MESSAGE(("Counting edges...\n"));
+    for(i=0; i < G->order; i++)
+        for(j=i+1; j < G->order; j++)
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] > 0)
+                G->size++;
 
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
     for(i=0; i < G->order; i++) {
