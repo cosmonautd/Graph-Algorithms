@@ -52,7 +52,7 @@ int get_vertex_degree(int vertex, struct Graph* G) {
     int j;
     int vertex_degree = 0;
     for(j=0; j < G->order; j++)
-        if(G->ADJ_MATRIX[get_index(vertex, j, order)] > 0 && j != vertex)
+        if(G->ADJ_MATRIX[get_index(vertex, j, G->order)] != 0 && j != vertex)
             vertex_degree++;
 
     return vertex_degree;
@@ -294,7 +294,7 @@ int graph_from_file(struct Graph* G, const char* path) {
     DEBUG_MESSAGE(("Counting edges...\n"));
     for(i=0; i < G->order; i++)
         for(j=i+1; j < G->order; j++)
-            if(G->ADJ_MATRIX[get_index(i,j,G->order)] > 0)
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
                 G->size++;
 
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
@@ -302,7 +302,7 @@ int graph_from_file(struct Graph* G, const char* path) {
         int vertex_degree = get_vertex_degree(i, G);
         G->ADJ_LISTS[i] = malloc(vertex_degree * sizeof(int));
         for(j=0, k=0; j < G->order && k < vertex_degree; j++)
-            if(G->ADJ_MATRIX[get_index(i, j, G->order)] > 0 && i != j) {
+            if(G->ADJ_MATRIX[get_index(i, j, G->order)] != 0 && i != j) {
                 G->ADJ_LISTS[i][k] = j;
                 k++;
             }
