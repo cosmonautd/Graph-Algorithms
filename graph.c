@@ -191,13 +191,80 @@ int is_tree(struct Graph* G) {
     return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
 }
 
+
+struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
+
+    int i, j, k;
+    struct Graph* G = malloc(sizeof(struct Graph));
+
+    G->order = order;
+    G->V = malloc(G->order * sizeof(int));
+    G->ADJ_MATRIX = malloc(G->order * G->order * sizeof(int));
+    G->ADJ_LISTS = malloc(G->order * sizeof(int*));
+    G->size = 0;
+    G->directed = 0;
+
+    DEBUG_MESSAGE(("Copying vertices...\n"));
+    for(i=0; i < G->order; i++) G->V[i] = V[i];
+
+    DEBUG_MESSAGE(("Copying adjacency matrix...\n"));
+    for(i=0; i < G->order * G->order; i++) G->ADJ_MATRIX[i] = ADJ_MATRIX[i];
+
+    DEBUG_MESSAGE(("Counting edges...\n"));
+    for(i=0; i < G->order; i++)
+        for(j=i+1; j < G->order; j++)
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
+                G->size++;
+
+    DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
+    for(i=0; i < G->order; i++) {
+        int vertex_degree = get_vertex_degree(i, G);
+        G->ADJ_LISTS[i] = malloc(vertex_degree * sizeof(int));
+        for(j=0, k=0; j < G->order && k < vertex_degree; j++)
+            if(G->ADJ_MATRIX[get_index(i, j, G->order)] != 0 && i != j) {
+                G->ADJ_LISTS[i][k] = j;
+                k++;
+            }
+    }
+
+    DEBUG_MESSAGE(("Checking directness...\n"));
+    for(i=0; i < G->order && !G->directed; i++) {
+        for(j=i+1; j < G->order && !G->directed; j++){
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)])
+                G->directed = 1;
+        }
+    }
+
+    DEBUG_MESSAGE(("Generated vertices:\n\n"));
+    for(i=0; i < G->order; i++) DEBUG_MESSAGE(("%d ", G->V[i]));
+    DEBUG_MESSAGE(("\n\n"));
+
+    DEBUG_MESSAGE(("Generated Adjacency Matrix:\n\n"));
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->order; j++) DEBUG_MESSAGE(("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]));
+        DEBUG_MESSAGE(("\n"));
+    }
+    DEBUG_MESSAGE(("\n"));
+
+    DEBUG_MESSAGE(("Generated Adjacency Lists:\n\n"));
+    for(i=0; i < G->order; i++) {
+        DEBUG_MESSAGE(("Vertex %d: ", i));
+        int vertex_degree = get_vertex_degree(i, G);
+        for(j=0; j < vertex_degree; j++) DEBUG_MESSAGE(("%d ", G->ADJ_LISTS[i][j]));
+        DEBUG_MESSAGE(("\n"));
+    }
+    DEBUG_MESSAGE(("\n"));
+
+    return G;
+}
+
 /*  Função graph_from_file()
     Realiza a leitura do arquivo de caminho path e preenche a estrutura Graph,
     cujo endereço é dado pelo ponteiro G.
 */
-int graph_from_file(struct Graph* G, const char* path) {
+struct Graph* new_graph_from_file(const char* path) {
 
-    int i, j, k;
+    int i;
 
     DEBUG_MESSAGE(("Opening file at: %s\n", path));
     FILE* file;
@@ -267,16 +334,13 @@ int graph_from_file(struct Graph* G, const char* path) {
                         "and a %dx%d Adjacency Matrix\n\n",
                             n_vertices, n_vertices, n_vertices));
 
-    G->V = malloc(n_vertices * sizeof(int));
-    G->ADJ_MATRIX = malloc(n_vertices * n_vertices * sizeof(int));
-    G->ADJ_LISTS = malloc(n_vertices * sizeof(int*));
-    G->order = n_vertices;
-    G->size = 0;
+    int* V = malloc(n_vertices * sizeof(int));
+    int* ADJ_MATRIX = malloc(n_vertices * n_vertices * sizeof(int));
 
     DEBUG_MESSAGE(("Generating Vertices...\n"));
     tokenize = strtok(vertices_list, ", ");
     for(i=0; tokenize != NULL; i++) {
-        G->V[i] = atoi(tokenize);
+        V[i] = atoi(tokenize);
         tokenize = strtok(NULL, ", ");
     }
 
@@ -285,65 +349,20 @@ int graph_from_file(struct Graph* G, const char* path) {
     DEBUG_MESSAGE(("Generating Adjacency Matrix...\n"));
     tokenize = strtok(adj_matrix, ", \n");
     for(i=0; tokenize != NULL; i++) {
-        G->ADJ_MATRIX[i] = atoi(tokenize);
+        ADJ_MATRIX[i] = atoi(tokenize);
         tokenize = strtok(NULL, ", \n");
     }
 
     free(adj_matrix);
 
-    DEBUG_MESSAGE(("Counting edges...\n"));
-    for(i=0; i < G->order; i++)
-        for(j=i+1; j < G->order; j++)
-            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
-                G->size++;
-
-    DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
-    for(i=0; i < G->order; i++) {
-        int vertex_degree = get_vertex_degree(i, G);
-        G->ADJ_LISTS[i] = malloc(vertex_degree * sizeof(int));
-        for(j=0, k=0; j < G->order && k < vertex_degree; j++)
-            if(G->ADJ_MATRIX[get_index(i, j, G->order)] != 0 && i != j) {
-                G->ADJ_LISTS[i][k] = j;
-                k++;
-            }
-    }
-
-    DEBUG_MESSAGE(("Generated vertices:\n\n"));
-    for(i=0; i < G->order; i++) DEBUG_MESSAGE(("%d ", G->V[i]));
-    DEBUG_MESSAGE(("\n\n"));
-
-    DEBUG_MESSAGE(("Generated Adjacency Matrix:\n\n"));
-    for(i=0; i < G->order; i++) {
-        for(j=0; j < G->order; j++) DEBUG_MESSAGE(("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]));
-        DEBUG_MESSAGE(("\n"));
-    }
-    DEBUG_MESSAGE(("\n"));
-
-    DEBUG_MESSAGE(("Generated Adjacency Lists:\n\n"));
-    for(i=0; i < G->order; i++) {
-        DEBUG_MESSAGE(("Vertex %d: ", i));
-        int vertex_degree = get_vertex_degree(i, G);
-        for(j=0; j < vertex_degree; j++) DEBUG_MESSAGE(("%d ", G->ADJ_LISTS[i][j]));
-        DEBUG_MESSAGE(("\n"));
-    }
-    DEBUG_MESSAGE(("\n"));
-
-    DEBUG_MESSAGE(("Checking directness...\n"));
-    G->directed = 0;
-    for(i=0; i < G->order && !G->directed; i++) {
-        for(j=i+1; j < G->order && !G->directed; j++){
-            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)])
-                G->directed = 1;
-        }
-    }
+    return new_graph(V, ADJ_MATRIX, n_vertices);
 }
 
 void main() {
 
     int i;
 
-    struct Graph* G = malloc(sizeof(struct Graph));
-    graph_from_file(G, "G.graph");
+    struct Graph* G = new_graph_from_file("G.graph");
 
     if(is_directed(G)) printf("\nDirected Graph\n");
     else printf("\nUndirected Graph\n");
@@ -357,6 +376,13 @@ void main() {
 
     printf("Graph order: %d\n", get_graph_order(G));
     printf("Graph size: %d\n", get_graph_size(G));
+
+    printf("\n\n");
+    struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
+
+    if(is_connected(G2, BREADTH_FIRST))
+        printf("\nConnected\n");
+    else printf("\nNot Connected\n");
 
     free(G->V);
     free(G->ADJ_MATRIX);
