@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /*  Define se o programa é compilado com impressão de linhas de debug
 */
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
     #define DEBUG_MESSAGE(x) printf x
@@ -56,6 +57,30 @@ int get_vertex_degree(int vertex, struct Graph* G) {
             vertex_degree++;
 
     return vertex_degree;
+}
+
+void print_vertices(struct Graph* G) {
+    int i;
+    for(i=0; i < G->order; i++) printf("%d ", G->V[i]);
+    printf("\n");
+}
+
+void print_adj_matrix(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->order; j++) printf("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]);
+        printf("\n");
+    }
+}
+
+void print_adj_lists(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        printf("Vertex %d: ", i);
+        int vertex_degree = get_vertex_degree(i, G);
+        for(j=0; j < vertex_degree; j++) printf("%d ", G->ADJ_LISTS[i][j]);
+        printf("\n");
+    }
 }
 
 /*  Função get_graph_order()
@@ -191,6 +216,47 @@ int is_tree(struct Graph* G) {
     return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
 }
 
+void add_edge(struct Graph* G, int v1, int v2, int weight) {
+
+    assert(weight != 0);
+    assert(v1 < G->order && v2 < G->order);
+
+    if(!G->directed) {
+
+        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
+        assert(G->ADJ_MATRIX[get_index(v2,v1,G->order)] == 0);
+
+        int d1 = get_vertex_degree(v1, G);
+        int d2 = get_vertex_degree(v2, G);
+
+        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
+        G->ADJ_MATRIX[get_index(v2,v1,G->order)] = weight;
+
+        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d1 + 1);
+        G->ADJ_LISTS[v2] = realloc(G->ADJ_LISTS[v2], d2 + 1);
+
+        G->ADJ_LISTS[v1][d1] = v2;
+        G->ADJ_LISTS[v2][d2] = v1;
+
+        G->size++;
+
+    } else {
+
+        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
+
+        int d = get_vertex_degree(v1, G);
+
+        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
+        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d + 1);
+        G->ADJ_LISTS[v1][d] = v2;
+    }
+
+}
+
+struct Graph* kruskal(struct Graph* G) {
+
+    struct Graph* T;
+}
 
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
 
@@ -270,8 +336,9 @@ struct Graph* new_graph_from_file(const char* path) {
     FILE* file;
     file = fopen(path, "r");
 
-    if(file != NULL)
+    if(file != NULL) {
         DEBUG_MESSAGE(("File opened successfully\n"));
+    }
     else {
         DEBUG_MESSAGE(("Error opening file\n"));
         exit(EXIT_FAILURE);
@@ -358,35 +425,57 @@ struct Graph* new_graph_from_file(const char* path) {
     return new_graph(V, ADJ_MATRIX, n_vertices);
 }
 
-void main() {
+void print_graph_info(struct Graph* G) {
 
-    int i;
+    if(is_directed(G)) printf("Directed Graph\n");
+    else printf("Undirected Graph\n");
 
-    struct Graph* G = new_graph_from_file("G.graph");
+    printf("\nVertices:\n\n");
+    print_vertices(G);
 
-    if(is_directed(G)) printf("\nDirected Graph\n");
-    else printf("\nUndirected Graph\n");
+    printf("\nAdjacency Matrix:\n\n");
+    print_adj_matrix(G);
+
+    printf("\nAdjacencies List:\n\n");
+    print_adj_lists(G);
+
+    printf("\n");
 
     //if(is_connected(G, DEPTH_FIRST))
     if(is_connected(G, BREADTH_FIRST))
-        printf("\nConnected\n");
-    else printf("\nNot Connected\n");
+        printf("Connected\n");
+    else printf("Not Connected\n");
 
-    if(is_tree(G)) printf("\nTree\n");
+    if(is_tree(G)) printf("Tree\n");
 
     printf("Graph order: %d\n", get_graph_order(G));
     printf("Graph size: %d\n", get_graph_size(G));
+}
 
-    printf("\n\n");
-    struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
+void free_graph(struct Graph* G) {
 
-    if(is_connected(G2, BREADTH_FIRST))
-        printf("\nConnected\n");
-    else printf("\nNot Connected\n");
+    int i;
 
     free(G->V);
     free(G->ADJ_MATRIX);
     for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
     free(G->ADJ_LISTS);
     free(G);
+}
+
+void main() {
+
+    struct Graph* G = new_graph_from_file("G.graph");
+    print_graph_info(G);
+
+    printf("\n*************************************************************\n");
+    printf("*************************************************************\n\n");
+
+    struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
+
+    add_edge(G2, 2, 9, 1);
+    print_graph_info(G2);
+
+    free_graph(G);
+    free_graph(G2);
 }
