@@ -5,7 +5,7 @@
 
 /*  Define se o programa é compilado com impressão de linhas de debug
 */
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
     #define DEBUG_MESSAGE(x) printf x
@@ -33,6 +33,12 @@ struct Graph {
     int order;
     int size;
     int directed;
+};
+
+struct Edge {
+    int v1;
+    int v2;
+    int weight;
 };
 
 /*  Função get_index()
@@ -426,6 +432,42 @@ void free_graph(struct Graph* G) {
     free(G);
 }
 
+int edge_weight_comparator(const void *x, const void *y) {
+    const struct Edge *E1 = (struct Edge *) x;
+    const struct Edge *E2 = (struct Edge *) y;
+
+    if(E1->weight < E2->weight) return -1;
+    else if(E1->weight > E2->weight) return 1;
+    else return 0;
+}
+
+struct Edge* sort_edges(struct Graph* G) {
+
+    int i, j, k = 0;
+
+    struct Edge* edges = malloc(G->size * sizeof(struct Edge));
+
+    if(!G->directed) {
+
+        for(i=0; i < G->order; i++)
+            for(j=i+1; j < G->order; j++)
+                if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
+                    edges[k].v1 = i;
+                    edges[k].v2 = j;
+                    edges[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
+                }
+
+        DEBUG_MESSAGE(("\nSorting Edges...\n"));
+        qsort(edges, G->size, sizeof(struct Edge), edge_weight_comparator);
+
+        DEBUG_MESSAGE(("\n"));
+        for(i=0; i < G->size; i++)
+            DEBUG_MESSAGE(("Edge: %d-%d, weight: %d\n", edges[i].v1, edges[i].v2, edges[i].weight));
+    }
+
+    return edges;
+}
+
 void add_edge(struct Graph* G, int v1, int v2, int weight) {
 
     assert(weight != 0);
@@ -465,8 +507,10 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
 
 struct Graph* kruskal(struct Graph* G) {
 
-    int* empty_adj_matrix = calloc(G->order * G->order * sizeof(int));
+    int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
     struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
+
+    struct Edge *sorted_edges = sort_edges(G);
 }
 
 void main() {
