@@ -216,48 +216,6 @@ int is_tree(struct Graph* G) {
     return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
 }
 
-void add_edge(struct Graph* G, int v1, int v2, int weight) {
-
-    assert(weight != 0);
-    assert(v1 < G->order && v2 < G->order);
-
-    if(!G->directed) {
-
-        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
-        assert(G->ADJ_MATRIX[get_index(v2,v1,G->order)] == 0);
-
-        int d1 = get_vertex_degree(v1, G);
-        int d2 = get_vertex_degree(v2, G);
-
-        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
-        G->ADJ_MATRIX[get_index(v2,v1,G->order)] = weight;
-
-        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d1 + 1);
-        G->ADJ_LISTS[v2] = realloc(G->ADJ_LISTS[v2], d2 + 1);
-
-        G->ADJ_LISTS[v1][d1] = v2;
-        G->ADJ_LISTS[v2][d2] = v1;
-
-        G->size++;
-
-    } else {
-
-        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
-
-        int d = get_vertex_degree(v1, G);
-
-        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
-        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d + 1);
-        G->ADJ_LISTS[v1][d] = v2;
-    }
-
-}
-
-struct Graph* kruskal(struct Graph* G) {
-
-    struct Graph* T;
-}
-
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
 
     int i, j, k;
@@ -461,6 +419,49 @@ void free_graph(struct Graph* G) {
     for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
     free(G->ADJ_LISTS);
     free(G);
+}
+
+void add_edge(struct Graph* G, int v1, int v2, int weight) {
+
+    assert(weight != 0);
+    assert(v1 < G->order && v2 < G->order);
+
+    if(!G->directed) {
+
+        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
+        assert(G->ADJ_MATRIX[get_index(v2,v1,G->order)] == 0);
+
+        int d1 = get_vertex_degree(v1, G);
+        int d2 = get_vertex_degree(v2, G);
+
+        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
+        G->ADJ_MATRIX[get_index(v2,v1,G->order)] = weight;
+
+        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d1 + 1);
+        G->ADJ_LISTS[v2] = realloc(G->ADJ_LISTS[v2], d2 + 1);
+
+        G->ADJ_LISTS[v1][d1] = v2;
+        G->ADJ_LISTS[v2][d2] = v1;
+
+        G->size++;
+
+    } else {
+
+        assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
+
+        int d = get_vertex_degree(v1, G);
+
+        G->ADJ_MATRIX[get_index(v1,v2,G->order)] = weight;
+        G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d + 1);
+        G->ADJ_LISTS[v1][d] = v2;
+    }
+
+}
+
+struct Graph* kruskal(struct Graph* G) {
+
+    int* empty_adj_matrix = calloc(G->order * G->order * sizeof(int));
+    struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
 }
 
 void main() {
