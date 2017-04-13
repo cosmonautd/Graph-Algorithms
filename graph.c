@@ -234,12 +234,6 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     DEBUG_MESSAGE(("Copying adjacency matrix...\n"));
     for(i=0; i < G->order * G->order; i++) G->ADJ_MATRIX[i] = ADJ_MATRIX[i];
 
-    DEBUG_MESSAGE(("Counting edges...\n"));
-    for(i=0; i < G->order; i++)
-        for(j=i+1; j < G->order; j++)
-            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
-                G->size++;
-
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
     for(i=0; i < G->order; i++) {
         int vertex_degree = get_vertex_degree(i, G);
@@ -258,6 +252,17 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
                 G->directed = 1;
         }
     }
+
+    DEBUG_MESSAGE(("Counting edges...\n"));
+    for(i=0; i < G->order; i++)
+        for(j=i+1; j < G->order; j++)
+            if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
+                G->size++;
+    if(G->directed)
+        for(i=0; i < G->order; i++)
+            for(j=0; j < i; j++)
+                if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
+                    G->size++;
 
     DEBUG_MESSAGE(("Generated vertices:\n\n"));
     for(i=0; i < G->order; i++) DEBUG_MESSAGE(("%d ", G->V[i]));
