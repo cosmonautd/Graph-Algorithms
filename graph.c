@@ -362,7 +362,9 @@ void free_graph(struct Graph* G) {
 
     free(G->V);
     free(G->ADJ_MATRIX);
+    free(G->INC_MATRIX);
     for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
+    free(G->EDGE_LIST);
     free(G->ADJ_LISTS);
     free(G);
 }
