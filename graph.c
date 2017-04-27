@@ -1,236 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
-/*  Define se o programa é compilado com impressão de linhas de debug
-*/
-//#define DEBUG
-
-#ifdef DEBUG
-    #define DEBUG_MESSAGE(x) printf x
-#else
-    #define DEBUG_MESSAGE(x) ;
-#endif
-
-/*  Macros para escolha de algoritmos de busca em profundidade ou largura
-*/
-#define DEPTH_FIRST 0
-#define BREADTH_FIRST 1
-
-struct Edge {
-    int v1;
-    int v2;
-    int weight;
-};
-
-/*  Estrutura Grafo
-    V: vértices
-    ADJ_MATRIX: matriz de adjacência
-    ADJ_LISTS: listas de adjacência
-    order: ordem do grafo (número de vértices)
-    size: tamanho do grafo (número de arestas)
-    directed: indica se o grafo é orientado (1) ou não (0)
-*/
-struct Graph {
-    int* V;
-    int* ADJ_MATRIX;
-    int* INC_MATRIX;
-    int** ADJ_LISTS;
-    struct Edge* EDGE_LIST;
-    int order;
-    int size;
-    int directed;
-};
-
-/*  Função get_index()
-    Dados os índices i, j e o comprimento das linhas de uma matriz
-    bidimensional, retorna o índice equivalente em uma representação da matriz
-    como um vetor unidimensional.
-*/
-int get_index(int i, int j, int rowsize) {
-    return j + i*rowsize;
-}
-
-/*  Função get_vertex_degree()
-    Retorna o grau de um vértice v no grafo G. O cálculo é feito através da
-    contagem de elementos positivos na linha da matriz de adjacência que
-    representa o vértice v.
-*/
-int get_vertex_degree(int vertex, struct Graph* G) {
-    int j;
-    int vertex_degree = 0;
-    for(j=0; j < G->order; j++)
-        if(G->ADJ_MATRIX[get_index(vertex, j, G->order)] != 0 && j != vertex)
-            vertex_degree++;
-
-    return vertex_degree;
-}
-
-void print_vertices(struct Graph* G) {
-    int i;
-    for(i=0; i < G->order; i++) printf("%d ", G->V[i]);
-    printf("\n");
-}
-
-void print_adj_matrix(struct Graph* G) {
-    int i, j;
-    for(i=0; i < G->order; i++) {
-        for(j=0; j < G->order; j++) printf("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]);
-        printf("\n");
-    }
-}
-
-void print_inc_matrix(struct Graph* G) {
-    int i, j;
-    for(i=0; i < G->order; i++) {
-        for(j=0; j < G->size; j++) printf("%d ", G->INC_MATRIX[get_index(i,j,G->size)]);
-        printf("\n");
-    }
-}
-
-void print_adj_lists(struct Graph* G) {
-    int i, j;
-    for(i=0; i < G->order; i++) {
-        printf("Vertex %d: ", i);
-        int vertex_degree = get_vertex_degree(i, G);
-        for(j=0; j < vertex_degree; j++) printf("%d ", G->ADJ_LISTS[i][j]);
-        printf("\n");
-    }
-}
-
-/*  Função get_graph_order()
-    Retorna a ordem do grafo G.
-*/
-int get_graph_order(struct Graph* G) {
-    return G->order;
-}
-
-/*  Função get_graph_size()
-    Retorna o tamanho do grafo G.
-*/
-int get_graph_size(struct Graph* G) {
-    return G->size;
-}
-
-/*  Função is_directed()
-    Retorna 1 se o grafo é orientado, 0 se é não-orientado.
-*/
-int is_directed(struct Graph* G) {
-    return G->directed;
-}
-
-/*  Função dfs()
-    Realiza uma busca em profundidade no grafo G, a partir do vértice v.
-    A entrada aux deve ser um vetor de comprimento igual à ordem de G.
-    A váriavel depth indica a profundidade atual durante a busca.
-    Ao fim da busca, os vértices alcançáveis a partir de v são indicados no
-    vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
-    é alcançável, e 0 caso contrário.
-*/
-void dfs(struct Graph* G, int v, int* aux, int depth) {
-
-    if(depth == 0) {
-        DEBUG_MESSAGE(("\nExecuting Depth First Traversal from vertex %d\n", v));
-        dfs(G, v, aux, ++depth);
-
-    } else {
-        aux[v] = 1;
-        DEBUG_MESSAGE(("Visiting vertex %d\n", v));
-        int j;
-        for(j=0; j < get_vertex_degree(v, G); j++) {
-            int w = G->ADJ_LISTS[v][j];
-            if(aux[w] == 0)
-                dfs(G, w, aux, depth++);
-        }
-    }
-}
-
-/*  Função bfs()
-    Realiza uma busca em largura no grafo G, a partir do vértice v.
-    A entrada aux deve ser um vetor de comprimento igual à ordem de G.
-    Ao fim da busca, os vértices alcançáveis a partir de v são indicados no
-    vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
-    é alcançável, e 0 caso contrário.
-*/
-void bfs(struct Graph* G, int v, int* aux) {
-
-    int* Q = calloc(G->order, sizeof(int));
-    int Q_start = 0;
-    int Q_end = 0;
-
-    DEBUG_MESSAGE(("\nExecuting Breadth First Traversal from vertex %d\n", v));
-
-    aux[v] = 1;
-    DEBUG_MESSAGE(("Visiting vertex %d\n", v));
-    Q[Q_end++] = v;
-
-    while(Q_start < Q_end) {
-        v = Q[Q_start++];
-        int j;
-        for(j=0; j < get_vertex_degree(v, G); j++) {
-            int w = G->ADJ_LISTS[v][j];
-            if(aux[w] == 0) {
-                Q[Q_end++] = w;
-                aux[w] = 1;
-                DEBUG_MESSAGE(("Visiting vertex %d\n", w));
-            }
-        }
-    }
-}
-
-/*  Função is_connected()
-    TLDR: Verifica se G é fortemente conexo.
-    Testa se o grafo G é conexo, utilizando o algoritmo indicado (DEPTH_FIRST
-    ou BREADTH_FIRST). Caso o grafo seja não-orientado, realiza uma busca a
-    partir do vértice 0 e verifica se todos os vértices são alcançáveis. caso
-    o grafo seja orientado, realiza uma busca para cada vértice de G e verifica
-    se ao final de cada busca, todos os vértices são alcançáveis.
-*/
-int is_connected(struct Graph* G, int algorithm) {
-
-    int i, j;
-
-    if(algorithm == DEPTH_FIRST) {
-
-        if(!is_directed(G)) {
-            int* aux = calloc(G->order, sizeof(int));
-            dfs(G, 0, aux, 0);
-            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
-            return 1;
-        } else {
-            for(i=0; i < G->order; i++) {
-                int* aux = calloc(G->order, sizeof(int));
-                dfs(G, i, aux, 0);
-                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
-            }
-            return 1;
-        }
-
-    } else if(algorithm = BREADTH_FIRST) {
-
-        if(!is_directed(G)) {
-            int* aux = calloc(G->order, sizeof(int));
-            bfs(G, 0, aux);
-            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
-            return 1;
-        } else {
-            for(i=0; i < G->order; i++) {
-                int* aux = calloc(G->order, sizeof(int));
-                bfs(G, i, aux);
-                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
-            }
-            return 1;
-        }
-    }
-}
-
-/*  Função is_tree()
-    Verifica se o grafo é uma árvore.
-*/
-int is_tree(struct Graph* G) {
-    return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
-}
+#include "graph.h"
 
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
 
@@ -438,6 +206,62 @@ struct Graph* new_graph_from_file(const char* path) {
     return new_graph(V, ADJ_MATRIX, n_vertices);
 }
 
+/*  Função get_index()
+    Dados os índices i, j e o comprimento das linhas de uma matriz
+    bidimensional, retorna o índice equivalente em uma representação da matriz
+    como um vetor unidimensional.
+*/
+int get_index(int i, int j, int rowsize) {
+    return j + i*rowsize;
+}
+
+/*  Função get_vertex_degree()
+    Retorna o grau de um vértice v no grafo G. O cálculo é feito através da
+    contagem de elementos positivos na linha da matriz de adjacência que
+    representa o vértice v.
+*/
+int get_vertex_degree(int vertex, struct Graph* G) {
+    int j;
+    int vertex_degree = 0;
+    for(j=0; j < G->order; j++)
+        if(G->ADJ_MATRIX[get_index(vertex, j, G->order)] != 0 && j != vertex)
+            vertex_degree++;
+
+    return vertex_degree;
+}
+
+void print_vertices(struct Graph* G) {
+    int i;
+    for(i=0; i < G->order; i++) printf("%d ", G->V[i]);
+    printf("\n");
+}
+
+void print_adj_matrix(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->order; j++) printf("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]);
+        printf("\n");
+    }
+}
+
+void print_inc_matrix(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->size; j++) printf("%d ", G->INC_MATRIX[get_index(i,j,G->size)]);
+        printf("\n");
+    }
+}
+
+void print_adj_lists(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        printf("Vertex %d: ", i);
+        int vertex_degree = get_vertex_degree(i, G);
+        for(j=0; j < vertex_degree; j++) printf("%d ", G->ADJ_LISTS[i][j]);
+        printf("\n");
+    }
+}
+
 void print_graph_info(struct Graph* G) {
 
     if(is_directed(G)) printf("Directed Graph\n");
@@ -468,41 +292,32 @@ void print_graph_info(struct Graph* G) {
     printf("Graph size: %d\n", get_graph_size(G));
 }
 
-void free_graph(struct Graph* G) {
-
-    int i;
-
-    free(G->V);
-    free(G->ADJ_MATRIX);
-    for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
-    free(G->ADJ_LISTS);
-    free(G);
+/*  Função get_graph_order()
+    Retorna a ordem do grafo G.
+*/
+int get_graph_order(struct Graph* G) {
+    return G->order;
 }
 
-int edge_weight_comparator(const void *x, const void *y) {
-    const struct Edge *E1 = (struct Edge *) x;
-    const struct Edge *E2 = (struct Edge *) y;
-
-    if(E1->weight < E2->weight) return -1;
-    else if(E1->weight > E2->weight) return 1;
-    else return 0;
+/*  Função get_graph_size()
+    Retorna o tamanho do grafo G.
+*/
+int get_graph_size(struct Graph* G) {
+    return G->size;
 }
 
-struct Edge* sort_edges(struct Graph* G) {
+/*  Função is_directed()
+    Retorna 1 se o grafo é orientado, 0 se é não-orientado.
+*/
+int is_directed(struct Graph* G) {
+    return G->directed;
+}
 
-    int i, j, k = 0;
-
-    struct Edge* edges = malloc(G->size * sizeof(struct Edge));
-    memcpy(edges, G->EDGE_LIST, G->size * sizeof(struct Edge));
-
-    DEBUG_MESSAGE(("\nSorting Edges...\n"));
-    qsort(edges, G->size, sizeof(struct Edge), edge_weight_comparator);
-
-    DEBUG_MESSAGE(("\n"));
-    for(i=0; i < G->size; i++)
-        DEBUG_MESSAGE(("Edge: %d-%d, weight: %d\n", edges[i].v1, edges[i].v2, edges[i].weight));
-
-    return edges;
+/*  Função is_tree()
+    Verifica se o grafo é uma árvore.
+*/
+int is_tree(struct Graph* G) {
+    return (is_connected(G, DEPTH_FIRST) && G->size == G->order - 1);
 }
 
 void add_edge(struct Graph* G, int v1, int v2, int weight) {
@@ -539,32 +354,15 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
         G->ADJ_LISTS[v1] = realloc(G->ADJ_LISTS[v1], d + 1);
         G->ADJ_LISTS[v1][d] = v2;
     }
-
 }
 
-struct Graph* kruskal(struct Graph* G) {
+void free_graph(struct Graph* G) {
 
-    assert(!G->directed);
+    int i;
 
-    int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
-    struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
-
-    struct Edge *sorted_edges = sort_edges(G);
-}
-
-void main() {
-
-    struct Graph* G = new_graph_from_file("G.graph");
-    print_graph_info(G);
-
-    printf("\n*************************************************************\n");
-    printf("*************************************************************\n\n");
-
-    struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
-    print_graph_info(G2);
-
-    sort_edges(G2);
-
-    free_graph(G);
-    free_graph(G2);
+    free(G->V);
+    free(G->ADJ_MATRIX);
+    for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
+    free(G->ADJ_LISTS);
+    free(G);
 }
