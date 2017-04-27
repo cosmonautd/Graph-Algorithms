@@ -18,6 +18,12 @@
 #define DEPTH_FIRST 0
 #define BREADTH_FIRST 1
 
+struct Edge {
+    int v1;
+    int v2;
+    int weight;
+};
+
 /*  Estrutura Grafo
     V: vértices
     ADJ_MATRIX: matriz de adjacência
@@ -29,16 +35,12 @@
 struct Graph {
     int* V;
     int* ADJ_MATRIX;
+    int* INC_MATRIX;
     int** ADJ_LISTS;
+    struct Edge* EDGE_LIST;
     int order;
     int size;
     int directed;
-};
-
-struct Edge {
-    int v1;
-    int v2;
-    int weight;
 };
 
 /*  Função get_index()
@@ -270,6 +272,26 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
                     G->size++;
 
+    DEBUG_MESSAGE(("Generating edge list...\n"));
+    G->EDGE_LIST = malloc(G->size*sizeof(struct Edge));
+    if(!G->directed) {
+        for(i=0; i < G->order; i++)
+            for(j=i+1; j < G->order; j++)
+                if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
+                    G->EDGE_LIST[k].v1 = i;
+                    G->EDGE_LIST[k].v2 = j;
+                    G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
+                }
+    } else {
+        for(i=0; i < G->order; i++)
+            for(j=0; j < G->order; j++)
+                if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0 && i != j) {
+                    G->EDGE_LIST[k].v1 = i;
+                    G->EDGE_LIST[k].v2 = j;
+                    G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
+                }
+    }
+
     DEBUG_MESSAGE(("Generated vertices:\n\n"));
     for(i=0; i < G->order; i++) DEBUG_MESSAGE(("%d ", G->V[i]));
     DEBUG_MESSAGE(("\n\n"));
@@ -446,24 +468,14 @@ struct Edge* sort_edges(struct Graph* G) {
     int i, j, k = 0;
 
     struct Edge* edges = malloc(G->size * sizeof(struct Edge));
+    memcpy(edges, G->EDGE_LIST, G->size * sizeof(struct Edge));
 
-    if(!G->directed) {
+    DEBUG_MESSAGE(("\nSorting Edges...\n"));
+    qsort(edges, G->size, sizeof(struct Edge), edge_weight_comparator);
 
-        for(i=0; i < G->order; i++)
-            for(j=i+1; j < G->order; j++)
-                if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
-                    edges[k].v1 = i;
-                    edges[k].v2 = j;
-                    edges[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
-                }
-
-        DEBUG_MESSAGE(("\nSorting Edges...\n"));
-        qsort(edges, G->size, sizeof(struct Edge), edge_weight_comparator);
-
-        DEBUG_MESSAGE(("\n"));
-        for(i=0; i < G->size; i++)
-            DEBUG_MESSAGE(("Edge: %d-%d, weight: %d\n", edges[i].v1, edges[i].v2, edges[i].weight));
-    }
+    DEBUG_MESSAGE(("\n"));
+    for(i=0; i < G->size; i++)
+        DEBUG_MESSAGE(("Edge: %d-%d, weight: %d\n", edges[i].v1, edges[i].v2, edges[i].weight));
 
     return edges;
 }
@@ -507,6 +519,8 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
 
 struct Graph* kruskal(struct Graph* G) {
 
+    assert(!G->directed);
+
     int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
     struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
 
@@ -523,7 +537,7 @@ void main() {
 
     struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
 
-    add_edge(G2, 2, 9, 1);
+    sort_edges(G2);
     print_graph_info(G2);
 
     free_graph(G);
