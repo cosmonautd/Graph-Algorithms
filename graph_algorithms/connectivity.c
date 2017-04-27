@@ -8,20 +8,49 @@
     vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
     é alcançável, e 0 caso contrário.
 */
-void dfs(struct Graph* G, int v, int* aux, int depth) {
+void dfs(struct Graph* G, int v, int* aux, int depth, int rep) {
 
     if(depth == 0) {
         DEBUG_MESSAGE(("\nExecuting Depth First Traversal from vertex %d\n", v));
-        dfs(G, v, aux, ++depth);
+        dfs(G, v, aux, ++depth, rep);
 
     } else {
         aux[v] = 1;
         DEBUG_MESSAGE(("Visiting vertex %d\n", v));
-        int j;
-        for(j=0; j < get_vertex_degree(v, G); j++) {
-            int w = G->ADJ_LISTS[v][j];
-            if(aux[w] == 0)
-                dfs(G, w, aux, depth++);
+
+        switch (rep) {
+            case USE_ADJ_LISTS: {
+                int i;
+                for(i=0; i < get_vertex_degree(v, G); i++) {
+                    int w = G->ADJ_LISTS[v][i];
+                    if(aux[w] == 0) dfs(G, w, aux, depth++, rep);
+                }
+                break;
+            }
+
+            case USE_ADJ_MATRIX: {
+                int i;
+                for(i=0; i < G->order; i++) {
+                    if(G->ADJ_MATRIX[get_index(v, i, G->order)] > 0) {
+                        int w = i;
+                        if(aux[w] == 0) dfs(G, w, aux, depth++, rep);
+                    }
+                }
+                break;
+            }
+
+            case USE_INC_MATRIX: {
+                break;
+            }
+
+            default: {
+                int i;
+                for(i=0; i < get_vertex_degree(v, G); i++) {
+                    int w = G->ADJ_LISTS[v][i];
+                    if(aux[w] == 0) dfs(G, w, aux, depth++, rep);
+                }
+                break;
+            }
         }
     }
 }
@@ -33,7 +62,7 @@ void dfs(struct Graph* G, int v, int* aux, int depth) {
     vetor aux, de tal forma que o valor no índice w em aux é 1 se o vértice w
     é alcançável, e 0 caso contrário.
 */
-void bfs(struct Graph* G, int v, int* aux) {
+void bfs(struct Graph* G, int v, int* aux, int rep) {
 
     int* Q = calloc(G->order, sizeof(int));
     int Q_start = 0;
@@ -47,13 +76,51 @@ void bfs(struct Graph* G, int v, int* aux) {
 
     while(Q_start < Q_end) {
         v = Q[Q_start++];
-        int j;
-        for(j=0; j < get_vertex_degree(v, G); j++) {
-            int w = G->ADJ_LISTS[v][j];
-            if(aux[w] == 0) {
-                Q[Q_end++] = w;
-                aux[w] = 1;
-                DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+
+        switch (rep) {
+            case USE_ADJ_LISTS: {
+                int i;
+                for(i=0; i < get_vertex_degree(v, G); i++) {
+                    int w = G->ADJ_LISTS[v][i];
+                    if(aux[w] == 0) {
+                        Q[Q_end++] = w;
+                        aux[w] = 1;
+                        DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+                    }
+                }
+                break;
+            }
+
+            case USE_ADJ_MATRIX: {
+                int i;
+                for(i=0; i < G->order; i++) {
+                    if(G->ADJ_MATRIX[get_index(v, i, G->order)] > 0) {
+                        int w = i;
+                        if(aux[w] == 0) {
+                            Q[Q_end++] = w;
+                            aux[w] = 1;
+                            DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+                        }
+                    }
+                }
+                break;
+            }
+
+            case USE_INC_MATRIX: {
+                break;
+            }
+
+            default: {
+                int i;
+                for(i=0; i < get_vertex_degree(v, G); i++) {
+                    int w = G->ADJ_LISTS[v][i];
+                    if(aux[w] == 0) {
+                        Q[Q_end++] = w;
+                        aux[w] = 1;
+                        DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+                    }
+                }
+                break;
             }
         }
     }
@@ -67,7 +134,7 @@ void bfs(struct Graph* G, int v, int* aux) {
     o grafo seja orientado, realiza uma busca para cada vértice de G e verifica
     se ao final de cada busca, todos os vértices são alcançáveis.
 */
-int is_connected(struct Graph* G, int algorithm) {
+int is_connected(struct Graph* G, int algorithm, int rep) {
 
     int i, j;
 
@@ -75,13 +142,13 @@ int is_connected(struct Graph* G, int algorithm) {
 
         if(!is_directed(G)) {
             int* aux = calloc(G->order, sizeof(int));
-            dfs(G, 0, aux, 0);
+            dfs(G, 0, aux, 0, rep);
             for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
             return 1;
         } else {
             for(i=0; i < G->order; i++) {
                 int* aux = calloc(G->order, sizeof(int));
-                dfs(G, i, aux, 0);
+                dfs(G, i, aux, 0, rep);
                 for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
             }
             return 1;
@@ -91,13 +158,13 @@ int is_connected(struct Graph* G, int algorithm) {
 
         if(!is_directed(G)) {
             int* aux = calloc(G->order, sizeof(int));
-            bfs(G, 0, aux);
+            bfs(G, 0, aux, rep);
             for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
             return 1;
         } else {
             for(i=0; i < G->order; i++) {
                 int* aux = calloc(G->order, sizeof(int));
-                bfs(G, i, aux);
+                bfs(G, i, aux, rep);
                 for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
             }
             return 1;
