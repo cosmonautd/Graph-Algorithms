@@ -281,8 +281,8 @@ void print_graph_info(struct Graph* G) {
 
     printf("\n");
 
-    //if(is_connected(G, DEPTH_FIRST, USE_ADJ_LISTS))
-    if(is_connected(G, BREADTH_FIRST, USE_ADJ_MATRIX))
+    if(is_connected(G, DEPTH_FIRST, USE_INC_MATRIX))
+    //if(is_connected(G, BREADTH_FIRST, USE_INC_MATRIX))
         printf("Connected\n");
     else printf("Not Connected\n");
 

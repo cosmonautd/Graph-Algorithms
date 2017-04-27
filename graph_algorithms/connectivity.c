@@ -40,6 +40,17 @@ void dfs(struct Graph* G, int v, int* aux, int depth, int rep) {
             }
 
             case USE_INC_MATRIX: {
+                int i, j;
+                for(j=0; j < G->size; j++) {
+                    if(G->INC_MATRIX[get_index(v, j, G->size)] > 0) {
+                        for(i=0; i < G->order; i++) {
+                            if(G->INC_MATRIX[get_index(i, j, G->size)] > 0 && i != v) {
+                                int w = i;
+                                if(aux[w] == 0) dfs(G, w, aux, depth++, rep);
+                            }
+                        }
+                    }
+                }
                 break;
             }
 
@@ -107,6 +118,21 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
             }
 
             case USE_INC_MATRIX: {
+                int i, j;
+                for(j=0; j < G->size; j++) {
+                    if(G->INC_MATRIX[get_index(v, j, G->size)] > 0) {
+                        for(i=0; i < G->order; i++) {
+                            if(G->INC_MATRIX[get_index(i, j, G->size)] > 0 && i != v) {
+                                int w = i;
+                                if(aux[w] == 0) {
+                                    Q[Q_end++] = w;
+                                    aux[w] = 1;
+                                    DEBUG_MESSAGE(("Visiting vertex %d\n", w));
+                                }
+                            }
+                        }
+                    }
+                }
                 break;
             }
 
