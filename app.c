@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 #include "graph.h"
 
@@ -14,7 +12,6 @@ void main() {
     printf("*************************************************************\n\n");
 
     struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
-    sort_edges(G2);
     print_graph_info(G2);
 
     free_graph(G);
