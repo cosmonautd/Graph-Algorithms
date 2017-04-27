@@ -5,7 +5,7 @@
 
 /*  Define se o programa é compilado com impressão de linhas de debug
 */
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
     #define DEBUG_MESSAGE(x) printf x
@@ -77,6 +77,14 @@ void print_adj_matrix(struct Graph* G) {
     int i, j;
     for(i=0; i < G->order; i++) {
         for(j=0; j < G->order; j++) printf("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]);
+        printf("\n");
+    }
+}
+
+void print_inc_matrix(struct Graph* G) {
+    int i, j;
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->size; j++) printf("%d ", G->INC_MATRIX[get_index(i,j,G->size)]);
         printf("\n");
     }
 }
@@ -239,7 +247,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     DEBUG_MESSAGE(("Copying vertices...\n"));
     for(i=0; i < G->order; i++) G->V[i] = V[i];
 
-    DEBUG_MESSAGE(("Copying adjacency matrix...\n"));
+    DEBUG_MESSAGE(("Copying Adjacency Matrix...\n"));
     for(i=0; i < G->order * G->order; i++) G->ADJ_MATRIX[i] = ADJ_MATRIX[i];
 
     DEBUG_MESSAGE(("Generating Adjacency Lists...\n\n"));
@@ -275,7 +283,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     DEBUG_MESSAGE(("Generating edge list...\n"));
     G->EDGE_LIST = malloc(G->size*sizeof(struct Edge));
     if(!G->directed) {
-        for(i=0; i < G->order; i++)
+        for(i=0, k=0; i < G->order; i++)
             for(j=i+1; j < G->order; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
                     G->EDGE_LIST[k].v1 = i;
@@ -283,13 +291,20 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
                     G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
                 }
     } else {
-        for(i=0; i < G->order; i++)
+        for(i=0, k=0; i < G->order; i++)
             for(j=0; j < G->order; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0 && i != j) {
                     G->EDGE_LIST[k].v1 = i;
                     G->EDGE_LIST[k].v2 = j;
                     G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
                 }
+    }
+
+    DEBUG_MESSAGE(("Generating Incidence Matrix...\n"));
+    G->INC_MATRIX = malloc(G->order * G->size * sizeof(int));
+    for(i=0; i < G->size; i++) {
+        G->INC_MATRIX[get_index(G->EDGE_LIST[i].v1, i, G->size)] = 1;
+        G->INC_MATRIX[get_index(G->EDGE_LIST[i].v2, i, G->size)] = 1;
     }
 
     DEBUG_MESSAGE(("Generated vertices:\n\n"));
@@ -299,6 +314,13 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     DEBUG_MESSAGE(("Generated Adjacency Matrix:\n\n"));
     for(i=0; i < G->order; i++) {
         for(j=0; j < G->order; j++) DEBUG_MESSAGE(("%d ", G->ADJ_MATRIX[get_index(i,j,G->order)]));
+        DEBUG_MESSAGE(("\n"));
+    }
+    DEBUG_MESSAGE(("\n"));
+
+    DEBUG_MESSAGE(("Generated Incidence Matrix:\n\n"));
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->size; j++) DEBUG_MESSAGE(("%d ", G->INC_MATRIX[get_index(i,j,G->size)]));
         DEBUG_MESSAGE(("\n"));
     }
     DEBUG_MESSAGE(("\n"));
@@ -427,6 +449,9 @@ void print_graph_info(struct Graph* G) {
     printf("\nAdjacency Matrix:\n\n");
     print_adj_matrix(G);
 
+    printf("\nIncidence Matrix:\n\n");
+    print_inc_matrix(G);
+
     printf("\nAdjacencies List:\n\n");
     print_adj_lists(G);
 
@@ -536,9 +561,9 @@ void main() {
     printf("*************************************************************\n\n");
 
     struct Graph* G2 = new_graph(G->V, G->ADJ_MATRIX, G->order);
+    print_graph_info(G2);
 
     sort_edges(G2);
-    print_graph_info(G2);
 
     free_graph(G);
     free_graph(G2);
