@@ -121,7 +121,7 @@ struct Graph* new_graph_from_file(const char* path) {
         DEBUG_MESSAGE(("File opened successfully\n"));
     }
     else {
-        DEBUG_MESSAGE(("Error opening file\n"));
+        printf("Error opening file: %s\n", path);
         exit(EXIT_FAILURE);
     }
 

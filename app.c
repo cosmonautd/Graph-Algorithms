@@ -5,7 +5,7 @@
 
 void main() {
 
-    struct Graph* G = new_graph_from_file("G2.graph");
+    struct Graph* G = new_graph_from_file("graph_files/G.graph");
     print_graph_info(G);
 
     printf("\n*************************************************************\n");
