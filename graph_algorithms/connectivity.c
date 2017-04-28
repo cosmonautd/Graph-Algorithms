@@ -197,3 +197,66 @@ int is_connected(struct Graph* G, int algorithm, int rep) {
         }
     }
 }
+
+struct Component* connected_components(struct Graph* G) {
+
+    assert(!is_directed(G));
+
+    int i;
+    int k = 0;
+    int visited = 0;
+
+    struct Component* root = malloc(sizeof(struct Component));
+    struct Component* conn = root;
+    conn->order = 0;
+    conn->next = NULL;
+
+    int start = 0;
+    int* visited_global = calloc(G->order, sizeof(int));
+
+    do {
+
+        int* visited_local = calloc(G->order, sizeof(int));
+
+        bfs(G, start, visited_local, USE_ADJ_LISTS);
+        for(i=0; i < G->order; i++) if(visited_local[i] == 1) conn->order++;
+        conn->elements = malloc(conn->order * sizeof(int));
+
+        for(i=0; i < G->order; i++) if(visited_local[i] == 1) {
+            visited_global[i] = 1;
+            conn->elements[k++] = i;
+        }
+
+        visited += conn->order;
+
+        for(i=0; i < G->order; i++) if(visited_global[i] == 0) { start = i; break; }
+
+        if(visited < G->order) {
+            conn->next = malloc(sizeof(struct Component));
+            conn = conn->next;
+            conn->order = 0;
+            conn->next = NULL;
+            k = 0;
+        }
+
+    } while(visited < G->order);
+
+    return root;
+}
+
+int count_connected_components(struct Component* component) {
+    int count;
+    for(count=0; component != NULL; count++) component = component->next;
+    return count;
+}
+
+void print_connected_components(struct Component* component) {
+    int i;
+    while(component != NULL) {
+        printf("Component order: %d\n", component->order);
+        printf("Component elements: ");
+        for(i=0; i < component->order; i++) printf("%d ", component->elements[i]);
+        printf("\n\n");
+        component = component->next;
+    }
+}
