@@ -286,7 +286,7 @@ void print_graph_info(struct Graph* G) {
         printf("Connected\n");
     else printf("Not Connected\n");
 
-    if(is_tree(G)) printf("Tree\n");
+    if(tree(G)) printf("Tree\n");
 
     printf("Graph order: %d\n", get_graph_order(G));
     printf("Graph size: %d\n", get_graph_size(G));
@@ -318,10 +318,10 @@ int complete(struct Graph* G) {
     else return (G->size == G->order*(G->order - 1));
 }
 
-/*  Função is_tree()
+/*  Função tree()
     Verifica se o grafo é uma árvore.
 */
-int is_tree(struct Graph* G) {
+int tree(struct Graph* G) {
     return (is_connected(G, DEPTH_FIRST, USE_ADJ_LISTS) && G->size == G->order - 1);
 }
 
