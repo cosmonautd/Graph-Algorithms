@@ -56,6 +56,7 @@ void print_graph_info(struct Graph* G);
 int get_graph_order(struct Graph* G);
 int get_graph_size(struct Graph* G);
 int is_directed(struct Graph* G);
+int is_compĺete(struct Graph* G);
 int is_tree(struct Graph* G);
 void add_edge(struct Graph* G, int v1, int v2, int weight);
 void free_graph(struct Graph* G);

@@ -314,8 +314,7 @@ int is_directed(struct Graph* G) {
 }
 
 int is_compĺete(struct Graph* G) {
-    if (!G->directed)
-        return (2*G->size == G->order*(G->order - 1));
+    if (!G->directed) return (2*G->size == G->order*(G->order - 1));
     else return (G->size == G->order*(G->order - 1));
 }
 
