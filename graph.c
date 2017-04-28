@@ -313,7 +313,7 @@ int oriented(struct Graph* G) {
     return G->oriented;
 }
 
-int is_complete(struct Graph* G) {
+int complete(struct Graph* G) {
     if (!G->oriented) return (2*G->size == G->order*(G->order - 1));
     else return (G->size == G->order*(G->order - 1));
 }
