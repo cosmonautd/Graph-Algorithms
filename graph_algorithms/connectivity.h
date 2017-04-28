@@ -20,7 +20,7 @@ struct Component {
 
 void dfs(struct Graph* G, int v, int* aux, int depth, int rep);
 void bfs(struct Graph* G, int v, int* aux, int rep);
-int is_connected(struct Graph* G, int algorithm, int rep);
+int connected(struct Graph* G, int algorithm, int rep);
 struct Component* connected_components(struct Graph* G);
 int count_connected_components(struct Component* component);
 void print_connected_components(struct Component* component);

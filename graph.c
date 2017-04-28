@@ -281,8 +281,8 @@ void print_graph_info(struct Graph* G) {
 
     printf("\n");
 
-    if(is_connected(G, DEPTH_FIRST, USE_INC_MATRIX))
-    //if(is_connected(G, BREADTH_FIRST, USE_INC_MATRIX))
+    if(connected(G, DEPTH_FIRST, USE_INC_MATRIX))
+    //if(connected(G, BREADTH_FIRST, USE_INC_MATRIX))
         printf("Connected\n");
     else printf("Not Connected\n");
 
@@ -322,7 +322,7 @@ int complete(struct Graph* G) {
     Verifica se o grafo é uma árvore.
 */
 int tree(struct Graph* G) {
-    return (is_connected(G, DEPTH_FIRST, USE_ADJ_LISTS) && G->size == G->order - 1);
+    return (connected(G, DEPTH_FIRST, USE_ADJ_LISTS) && G->size == G->order - 1);
 }
 
 void add_edge(struct Graph* G, int v1, int v2, int weight) {

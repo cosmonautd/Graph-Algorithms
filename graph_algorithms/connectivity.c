@@ -152,7 +152,7 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
     }
 }
 
-/*  Função is_connected()
+/*  Função connected()
     TLDR: Verifica se G é fortemente conexo.
     Testa se o grafo G é conexo, utilizando o algoritmo indicado (DEPTH_FIRST
     ou BREADTH_FIRST). Caso o grafo seja não-orientado, realiza uma busca a
@@ -160,7 +160,7 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
     o grafo seja orientado, realiza uma busca para cada vértice de G e verifica
     se ao final de cada busca, todos os vértices são alcançáveis.
 */
-int is_connected(struct Graph* G, int algorithm, int rep) {
+int connected(struct Graph* G, int algorithm, int rep) {
 
     int i, j;
 
