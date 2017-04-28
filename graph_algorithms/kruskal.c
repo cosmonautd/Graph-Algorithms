@@ -28,7 +28,7 @@ struct Edge* sort_edges(struct Graph* G) {
 
 struct Graph* kruskal(struct Graph* G) {
 
-    assert(!G->directed);
+    assert(!G->oriented);
 
     int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
     struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);

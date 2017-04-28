@@ -28,7 +28,7 @@ struct Edge {
     ADJ_LISTS: listas de adjacência
     order: ordem do grafo (número de vértices)
     size: tamanho do grafo (número de arestas)
-    directed: indica se o grafo é orientado (1) ou não (0)
+    oriented: indica se o grafo é orientado (1) ou não (0)
 */
 struct Graph {
     int* V;
@@ -38,7 +38,7 @@ struct Graph {
     struct Edge* EDGE_LIST;
     int order;
     int size;
-    int directed;
+    int oriented;
 };
 
 #include "graph_algorithms/connectivity.h"
@@ -55,8 +55,8 @@ void print_adj_lists(struct Graph* G);
 void print_graph_info(struct Graph* G);
 int get_graph_order(struct Graph* G);
 int get_graph_size(struct Graph* G);
-int is_directed(struct Graph* G);
-int is_compĺete(struct Graph* G);
+int oriented(struct Graph* G);
+int is_complete(struct Graph* G);
 int is_tree(struct Graph* G);
 void add_edge(struct Graph* G, int v1, int v2, int weight);
 void free_graph(struct Graph* G);

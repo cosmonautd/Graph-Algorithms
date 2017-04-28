@@ -10,7 +10,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     G->ADJ_MATRIX = malloc(G->order * G->order * sizeof(int));
     G->ADJ_LISTS = malloc(G->order * sizeof(int*));
     G->size = 0;
-    G->directed = 0;
+    G->oriented = 0;
 
     DEBUG_MESSAGE(("Copying vertices...\n"));
     for(i=0; i < G->order; i++) G->V[i] = V[i];
@@ -30,10 +30,10 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     }
 
     DEBUG_MESSAGE(("Checking directness...\n"));
-    for(i=0; i < G->order && !G->directed; i++) {
-        for(j=i+1; j < G->order && !G->directed; j++){
+    for(i=0; i < G->order && !G->oriented; i++) {
+        for(j=i+1; j < G->order && !G->oriented; j++){
             if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)])
-                G->directed = 1;
+                G->oriented = 1;
         }
     }
 
@@ -42,7 +42,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
         for(j=i+1; j < G->order; j++)
             if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
                 G->size++;
-    if(G->directed)
+    if(G->oriented)
         for(i=0; i < G->order; i++)
             for(j=0; j < i; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0)
@@ -50,7 +50,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
 
     DEBUG_MESSAGE(("Generating edge list...\n"));
     G->EDGE_LIST = malloc(G->size*sizeof(struct Edge));
-    if(!G->directed) {
+    if(!G->oriented) {
         for(i=0, k=0; i < G->order; i++)
             for(j=i+1; j < G->order; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
@@ -264,8 +264,8 @@ void print_adj_lists(struct Graph* G) {
 
 void print_graph_info(struct Graph* G) {
 
-    if(is_directed(G)) printf("Directed Graph\n");
-    else printf("Undirected Graph\n");
+    if(G->oriented) printf("Oriented Graph\n");
+    else printf("Not Oriented Graph\n");
 
     printf("\nVertices:\n\n");
     print_vertices(G);
@@ -306,15 +306,15 @@ int get_graph_size(struct Graph* G) {
     return G->size;
 }
 
-/*  Função is_directed()
+/*  Função oriented()
     Retorna 1 se o grafo é orientado, 0 se é não-orientado.
 */
-int is_directed(struct Graph* G) {
-    return G->directed;
+int oriented(struct Graph* G) {
+    return G->oriented;
 }
 
-int is_compĺete(struct Graph* G) {
-    if (!G->directed) return (2*G->size == G->order*(G->order - 1));
+int is_complete(struct Graph* G) {
+    if (!G->oriented) return (2*G->size == G->order*(G->order - 1));
     else return (G->size == G->order*(G->order - 1));
 }
 
@@ -330,7 +330,7 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
     assert(weight != 0);
     assert(v1 < G->order && v2 < G->order);
 
-    if(!G->directed) {
+    if(!G->oriented) {
 
         assert(G->ADJ_MATRIX[get_index(v1,v2,G->order)] == 0);
         assert(G->ADJ_MATRIX[get_index(v2,v1,G->order)] == 0);

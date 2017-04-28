@@ -166,7 +166,7 @@ int is_connected(struct Graph* G, int algorithm, int rep) {
 
     if(algorithm == DEPTH_FIRST) {
 
-        if(!is_directed(G)) {
+        if(!G->oriented) {
             int* aux = calloc(G->order, sizeof(int));
             dfs(G, 0, aux, 0, rep);
             for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
@@ -182,7 +182,7 @@ int is_connected(struct Graph* G, int algorithm, int rep) {
 
     } else if(algorithm = BREADTH_FIRST) {
 
-        if(!is_directed(G)) {
+        if(!G->oriented) {
             int* aux = calloc(G->order, sizeof(int));
             bfs(G, 0, aux, rep);
             for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
@@ -200,7 +200,7 @@ int is_connected(struct Graph* G, int algorithm, int rep) {
 
 struct Component* connected_components(struct Graph* G) {
 
-    assert(!is_directed(G));
+    assert(!G->oriented);
 
     int i;
     int k = 0;
