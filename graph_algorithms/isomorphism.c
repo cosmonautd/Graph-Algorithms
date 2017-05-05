@@ -74,7 +74,7 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
             break;
         }
 
-        case USE_ADJ_MATRIX: { // TODO: Not working. Make it work.
+        case USE_ADJ_MATRIX: { // TODO: Works os tests, but need more testing
 
             int i, j;
             int* permutation = malloc(G1->order * sizeof(int));
@@ -85,47 +85,12 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
                 int* adj_matrix_copy = calloc(G1->order*G1->order, sizeof(int));
 
                 relabel(G1->ADJ_MATRIX, adj_matrix_copy, G1->order, permutation);
-                // DEBUG
-                if( permutation[0] == 7 &&
-                    permutation[1] == 0 &&
-                    permutation[2] == 6 &&
-                    permutation[3] == 5 &&
-                    permutation[4] == 3 &&
-                    permutation[5] == 4 &&
-                    permutation[6] == 2 &&
-                    permutation[7] == 1) {
-
-                    for(i=0; i < G1->order; i++) {
-                        for(j=0; j < G1->order; j++) printf("%d ", adj_matrix_copy[get_index(i,j,G1->order)]);
-                        printf("\n");
-                    }
-                    printf("\n");
-                }
-                // DEBUG
-
                 fixref(G1->ADJ_MATRIX, adj_matrix_copy, G1->order, permutation);
-                // DEBUG
-                if( permutation[0] == 7 &&
-                    permutation[1] == 0 &&
-                    permutation[2] == 6 &&
-                    permutation[3] == 5 &&
-                    permutation[4] == 3 &&
-                    permutation[5] == 4 &&
-                    permutation[6] == 2 &&
-                    permutation[7] == 1) {
-
-                    for(i=0; i < G1->order; i++) {
-                        for(j=0; j < G1->order; j++) printf("%d ", adj_matrix_copy[get_index(i,j,G1->order)]);
-                        printf("\n");
-                    }
-                    printf("\n");
-                }
-                // DEBUG
 
                 if(equals_adj_matrix(adj_matrix_copy, G2->ADJ_MATRIX, G2->order)) {
                     memcpy(mapping, permutation, G1->order * sizeof(int));
                     isomorphic = true;
-                    //return isomorphic;
+                    return isomorphic;
                 }
 
                 free(adj_matrix_copy);
