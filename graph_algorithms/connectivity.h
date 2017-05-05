@@ -8,9 +8,11 @@
 #define DEPTH_FIRST     0
 #define BREADTH_FIRST   1
 
+#ifndef USE_ADJ_LISTS
 #define USE_ADJ_LISTS   2
 #define USE_ADJ_MATRIX  3
 #define USE_INC_MATRIX  4
+#endif
 
 struct Component {
     int order;
