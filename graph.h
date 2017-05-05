@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 /*  Define se o programa é compilado com impressão de linhas de debug
 */
@@ -42,6 +43,7 @@ struct Graph {
 };
 
 #include "graph_algorithms/connectivity.h"
+#include "graph_algorithms/isomorphism.h"
 #include "graph_algorithms/kruskal.h"
 
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order);
