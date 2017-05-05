@@ -69,7 +69,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     }
 
     DEBUG_MESSAGE(("Generating Incidence Matrix...\n"));
-    G->INC_MATRIX = malloc(G->order * G->size * sizeof(int));
+    G->INC_MATRIX = calloc(G->order * G->size, sizeof(int));
     for(i=0; i < G->size; i++) {
         G->INC_MATRIX[get_index(G->EDGE_LIST[i].v1, i, G->size)] = 1;
         G->INC_MATRIX[get_index(G->EDGE_LIST[i].v2, i, G->size)] = 1;
