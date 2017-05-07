@@ -39,7 +39,7 @@ struct Graph {
     struct Edge* EDGE_LIST;
     int order;
     int size;
-    int oriented;
+    bool oriented;
 };
 
 #include "graph_algorithms/connectivity.h"
@@ -57,9 +57,9 @@ void print_adj_lists(struct Graph* G);
 void print_graph_info(struct Graph* G);
 int get_graph_order(struct Graph* G);
 int get_graph_size(struct Graph* G);
-int oriented(struct Graph* G);
-int complete(struct Graph* G);
-int tree(struct Graph* G);
+bool oriented(struct Graph* G);
+bool complete(struct Graph* G);
+bool tree(struct Graph* G);
 void add_edge(struct Graph* G, int v1, int v2, int weight);
 void free_graph(struct Graph* G);
 

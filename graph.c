@@ -10,7 +10,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     G->ADJ_MATRIX = malloc(G->order * G->order * sizeof(int));
     G->ADJ_LISTS = malloc(G->order * sizeof(int*));
     G->size = 0;
-    G->oriented = 0;
+    G->oriented = false;
 
     DEBUG_MESSAGE(("Copying vertices...\n"));
     for(i=0; i < G->order; i++) G->V[i] = V[i];
@@ -33,7 +33,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     for(i=0; i < G->order && !G->oriented; i++) {
         for(j=i+1; j < G->order && !G->oriented; j++){
             if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)])
-                G->oriented = 1;
+                G->oriented = true;
         }
     }
 
@@ -311,11 +311,11 @@ int get_graph_size(struct Graph* G) {
 /*  Função oriented()
     Retorna 1 se o grafo é orientado, 0 se é não-orientado.
 */
-int oriented(struct Graph* G) {
+bool oriented(struct Graph* G) {
     return G->oriented;
 }
 
-int complete(struct Graph* G) {
+bool complete(struct Graph* G) {
     if (!G->oriented) return (2*G->size == G->order*(G->order - 1));
     else return (G->size == G->order*(G->order - 1));
 }
@@ -323,7 +323,7 @@ int complete(struct Graph* G) {
 /*  Função tree()
     Verifica se o grafo é uma árvore.
 */
-int tree(struct Graph* G) {
+bool tree(struct Graph* G) {
     return (connected(G, DEPTH_FIRST, USE_ADJ_LISTS) && G->size == G->order - 1);
 }
 

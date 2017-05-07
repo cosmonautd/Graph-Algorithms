@@ -162,25 +162,25 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
     o grafo seja orientado, realiza uma busca para cada vértice de G e verifica
     se ao final de cada busca, todos os vértices são alcançáveis.
 */
-int connected(struct Graph* G, int algorithm, int rep) {
+bool connected(struct Graph* G, int algorithm, int rep) {
 
     int i, j;
 
     if(algorithm == DEPTH_FIRST) {
 
         if(!G->oriented) {
-            int connected = 1;
+            int connected = true;
             int* aux = calloc(G->order, sizeof(int));
             dfs(G, 0, aux, 0, rep);
-            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = 0;
+            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = false;
             free(aux);
             return connected;
         } else {
-            int connected = 1;
+            int connected = true;
             for(i=0; i < G->order && connected; i++) {
                 int* aux = calloc(G->order, sizeof(int));
                 dfs(G, i, aux, 0, rep);
-                for(j=0; j < G->order & connected; j++) if(aux[j] == 0) connected = 0;
+                for(j=0; j < G->order & connected; j++) if(aux[j] == 0) connected = false;
                 free(aux);
             }
             return connected;
@@ -189,18 +189,18 @@ int connected(struct Graph* G, int algorithm, int rep) {
     } else if(algorithm = BREADTH_FIRST) {
 
         if(!G->oriented) {
-            int connected = 1;
+            int connected = true;
             int* aux = calloc(G->order, sizeof(int));
             bfs(G, 0, aux, rep);
-            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = 0;
+            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = false;
             free(aux);
             return connected;
         } else {
-            int connected = 1;
+            int connected = true;
             for(i=0; i < G->order && connected; i++) {
                 int* aux = calloc(G->order, sizeof(int));
                 bfs(G, i, aux, rep);
-                for(j=0; j < G->order && connected; j++) if(aux[j] == 0) connected = 0;
+                for(j=0; j < G->order && connected; j++) if(aux[j] == 0) connected = false;
                 free(aux);
             }
             return connected;

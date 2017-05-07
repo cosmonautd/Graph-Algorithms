@@ -62,5 +62,5 @@ void kruskal_example() {
 
 void main() {
 
-    isomorphism_example();
+    connected_components_example();
 }
