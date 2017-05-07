@@ -36,10 +36,10 @@ void isomorphism_example() {
     int* mapping = malloc(G1->order * sizeof(int));
 
     if(isomorphic(G1, G2, mapping, USE_ADJ_MATRIX)) {
-        printf("G1 and G2 are isomorphic\n");
-        printf("f: G2 -> G1\n");
+        printf("G1 and G2 are isomorphic\n\n");
+        printf("f: G2->G1\n");
         int i;
-        for(i=0; i < G1->order; i++) printf("f(%d) = %d\n", i, mapping[i]);
+        for(i=0; i < G1->order; i++) printf(" f(%d) = %d\n", i, mapping[i]);
     }
     else printf("G1 and G2 are not isomorphic\n");
 }

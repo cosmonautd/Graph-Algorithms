@@ -26,39 +26,57 @@ bool next_permutation(int* v, int len) {
     for(k=0; i+1+k < len-1-k; k++) swap(v, i+1+k, len-1-k);
 }
 
-void relabel(int* base_matrix, int* copy_matrix, int len, int* mapping) {
+int* getpmatrix(int* mapping, int len, bool transpose) {
+    int i;
+    int* pmatrix = calloc(len*len, sizeof(int));
 
-    int i, j;
-    for(i=0; i < len; i++) {
-        for(j=0; j < len; j++) {
-            copy_matrix[get_index(i, j, len)] = base_matrix[get_index(mapping[i], j, len)];
-        }
-    }
+    if(!transpose)
+        for(i=0; i < len; i++)
+            pmatrix[get_index(i, mapping[i], len)] = 1;
+    else
+        for(i=0; i < len; i++)
+            pmatrix[get_index(mapping[i], i, len)] = 1;
+
+    return pmatrix;
 }
 
-void fixref(int* base_matrix, int* copy_matrix, int len, int* mapping) {
-
-    int i, j;
-    int* tmp_matrix = calloc(len*len, sizeof(int));
-
+int* multmatrix(int* M1, int* M2, int len) {
+    int i, j, k;
+    int* tmp = calloc(len*len, sizeof(int));
     for(i=0; i < len; i++) {
         for(j=0; j < len; j++) {
-            if(copy_matrix[get_index(i, j, len)] > 0) {
-                int aux = mapping[j];
-                tmp_matrix[get_index(i, aux, len)] = copy_matrix[get_index(i, j, len)];
+            for(k=0; k < len; k++) {
+                tmp[get_index(i,j,len)] += M1[get_index(i,k,len)] * M2[get_index(k,j,len)];
             }
         }
     }
-    memcpy(copy_matrix, tmp_matrix, len*len*sizeof(int));
+    return tmp;
 }
 
-bool equals_adj_matrix(int* adj_matrix1, int* adj_matrix2, int len) {
+bool equals_adjmatrix(int* adjmatrix1, int* adjmatrix2, int len) {
     int i, j;
     for(i=0; i < len; i++)
         for(j=0; j < len; j++)
-            if(adj_matrix1[get_index(i, j, len)] != adj_matrix2[get_index(i, j, len)])
+            if(adjmatrix1[get_index(i, j, len)] != adjmatrix2[get_index(i, j, len)])
                 return false;
     return true;
+}
+
+bool isomap(struct Graph* G1, struct Graph* G2, int* mapping) {
+
+    int* pmatrix = getpmatrix(mapping, G1->order, false);
+    int* ptmatrix = getpmatrix(mapping, G1->order, true);
+
+    int* tmp = multmatrix(pmatrix, G1->ADJ_MATRIX, G1->order);
+    tmp = multmatrix(tmp, ptmatrix, G1->order);
+
+    bool output = equals_adjmatrix(tmp, G2->ADJ_MATRIX, G2->order);
+
+    free(pmatrix);
+    free(ptmatrix);
+    free(tmp);
+
+    return output;
 }
 
 bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
@@ -74,28 +92,23 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
             break;
         }
 
-        case USE_ADJ_MATRIX: { // TODO: Works os tests, but need more testing
+        case USE_ADJ_MATRIX: {
 
-            int i, j;
+            int i;
             int* permutation = malloc(G1->order * sizeof(int));
             for(i=0; i < G1->order; i++) permutation[i] = i;
 
             do {
 
-                int* adj_matrix_copy = calloc(G1->order*G1->order, sizeof(int));
-
-                relabel(G1->ADJ_MATRIX, adj_matrix_copy, G1->order, permutation);
-                fixref(G1->ADJ_MATRIX, adj_matrix_copy, G1->order, permutation);
-
-                if(equals_adj_matrix(adj_matrix_copy, G2->ADJ_MATRIX, G2->order)) {
+                if(isomap(G1, G2, permutation)) {
                     memcpy(mapping, permutation, G1->order * sizeof(int));
                     isomorphic = true;
                     return isomorphic;
                 }
 
-                free(adj_matrix_copy);
-
             } while(next_permutation(permutation, G1->order));
+
+            free(permutation);
 
             break;
         }
