@@ -176,6 +176,8 @@ struct Graph* new_graph_from_file(const char* path) {
         tokenize = strtok(NULL, ", ");
     }
 
+    free(vertices_list_copy);
+
     DEBUG_MESSAGE(("Vertices found: %d\n", n_vertices));
 
     DEBUG_MESSAGE(("Allocating memory for %d vertices "
@@ -369,7 +371,7 @@ void free_graph(struct Graph* G) {
     free(G->ADJ_MATRIX);
     free(G->INC_MATRIX);
     for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
-    free(G->EDGE_LIST);
     free(G->ADJ_LISTS);
+    free(G->EDGE_LIST);
     free(G);
 }

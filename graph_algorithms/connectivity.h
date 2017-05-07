@@ -26,5 +26,6 @@ int connected(struct Graph* G, int algorithm, int rep);
 struct Component* connected_components(struct Graph* G);
 int count_connected_components(struct Component* component);
 void print_connected_components(struct Component* component);
+void free_component(struct Component* component);
 
 #endif

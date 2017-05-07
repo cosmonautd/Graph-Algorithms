@@ -5,7 +5,7 @@
 
 void connected_components_example() {
 
-    struct Graph* G = new_graph_from_file("graph_files/G1.graph");
+    struct Graph* G = new_graph_from_file("graph_files/G2.graph");
     print_graph_info(G);
 
     printf("\n*************************************************************\n");
@@ -17,6 +17,7 @@ void connected_components_example() {
     print_connected_components(component);
 
     free_graph(G);
+    free_component(component);
 }
 
 void isomorphism_example() {
@@ -42,6 +43,21 @@ void isomorphism_example() {
         for(i=0; i < G1->order; i++) printf(" f(%d) = %d\n", i, mapping[i]);
     }
     else printf("G1 and G2 are not isomorphic\n");
+
+    free_graph(G1);
+    free_graph(G2);
+    free(mapping);
+}
+
+void kruskal_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G1.graph");
+    print_graph_info(G);
+
+    printf("\n*************************************************************\n");
+    printf("*************************************************************\n\n");
+
+    struct Graph* T = kruskal(G);
 }
 
 void main() {

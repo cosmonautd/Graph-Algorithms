@@ -150,6 +150,8 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
             }
         }
     }
+
+    free(Q);
 }
 
 /*  Função connected()
@@ -167,33 +169,41 @@ int connected(struct Graph* G, int algorithm, int rep) {
     if(algorithm == DEPTH_FIRST) {
 
         if(!G->oriented) {
+            int connected = 1;
             int* aux = calloc(G->order, sizeof(int));
             dfs(G, 0, aux, 0, rep);
-            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
-            return 1;
+            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = 0;
+            free(aux);
+            return connected;
         } else {
-            for(i=0; i < G->order; i++) {
+            int connected = 1;
+            for(i=0; i < G->order && connected; i++) {
                 int* aux = calloc(G->order, sizeof(int));
                 dfs(G, i, aux, 0, rep);
-                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
+                for(j=0; j < G->order & connected; j++) if(aux[j] == 0) connected = 0;
+                free(aux);
             }
-            return 1;
+            return connected;
         }
 
     } else if(algorithm = BREADTH_FIRST) {
 
         if(!G->oriented) {
+            int connected = 1;
             int* aux = calloc(G->order, sizeof(int));
             bfs(G, 0, aux, rep);
-            for(i=0; i < G->order; i++) if(aux[i] == 0) return 0;
-            return 1;
+            for(i=0; i < G->order && connected; i++) if(aux[i] == 0) connected = 0;
+            free(aux);
+            return connected;
         } else {
-            for(i=0; i < G->order; i++) {
+            int connected = 1;
+            for(i=0; i < G->order && connected; i++) {
                 int* aux = calloc(G->order, sizeof(int));
                 bfs(G, i, aux, rep);
-                for(j=0; j < G->order; j++) if(aux[j] == 0) return 0;
+                for(j=0; j < G->order && connected; j++) if(aux[j] == 0) connected = 0;
+                free(aux);
             }
-            return 1;
+            return connected;
         }
     }
 }
@@ -239,7 +249,14 @@ struct Component* connected_components(struct Graph* G) {
             k = 0;
         }
 
+        free(visited_local);
+
     } while(visited < G->order);
+
+    conn = NULL;
+
+    free(visited_global);
+    free(conn);
 
     return root;
 }
@@ -259,4 +276,9 @@ void print_connected_components(struct Component* component) {
         printf("\n\n");
         component = component->next;
     }
+}
+
+void free_component(struct Component* component) {
+    if(component->next != NULL) free_component(component->next);
+    free(component);
 }

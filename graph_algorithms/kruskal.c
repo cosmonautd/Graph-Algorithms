@@ -33,5 +33,7 @@ struct Graph* kruskal(struct Graph* G) {
     int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
     struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
 
+    free(empty_adj_matrix);
+
     struct Edge *sorted_edges = sort_edges(G);
 }
