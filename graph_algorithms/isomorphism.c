@@ -62,29 +62,7 @@ bool equals_adjmatrix(int* adjmatrix1, int* adjmatrix2, int len) {
     return true;
 }
 
-bool isomap(struct Graph* G1, struct Graph* G2, int* mapping) {
-
-    int* pmatrix = getpmatrix(mapping, G1->order, false);
-    int* ptmatrix = getpmatrix(mapping, G1->order, true);
-
-    int* tmp = multmatrix(pmatrix, G1->ADJ_MATRIX, G1->order);
-    tmp = multmatrix(tmp, ptmatrix, G1->order);
-
-    bool output = equals_adjmatrix(tmp, G2->ADJ_MATRIX, G2->order);
-
-    free(pmatrix);
-    free(ptmatrix);
-    free(tmp);
-
-    return output;
-}
-
-bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
-
-    if(G1->order != G2->order) return false;
-    if(G1->size != G2->size) return false;
-
-    bool isomorphic = false;
+bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
 
     switch (rep) {
 
@@ -94,23 +72,19 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
 
         case USE_ADJ_MATRIX: {
 
-            int i;
-            int* permutation = malloc(G1->order * sizeof(int));
-            for(i=0; i < G1->order; i++) permutation[i] = i;
+            int* pmatrix = getpmatrix(mapping, G1->order, false);
+            int* ptmatrix = getpmatrix(mapping, G1->order, true);
 
-            do {
+            int* tmp = multmatrix(pmatrix, G1->ADJ_MATRIX, G1->order);
+            tmp = multmatrix(tmp, ptmatrix, G1->order);
 
-                if(isomap(G1, G2, permutation)) {
-                    memcpy(mapping, permutation, G1->order * sizeof(int));
-                    isomorphic = true;
-                    return isomorphic;
-                }
+            bool output = equals_adjmatrix(tmp, G2->ADJ_MATRIX, G2->order);
 
-            } while(next_permutation(permutation, G1->order));
+            free(pmatrix);
+            free(ptmatrix);
+            free(tmp);
 
-            free(permutation);
-
-            break;
+            return output;
         }
 
         case USE_INC_MATRIX: {
@@ -121,6 +95,30 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
             break;
         }
     }
+}
+
+bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
+
+    if(G1->order != G2->order) return false;
+    if(G1->size != G2->size) return false;
+
+    bool isomorphic = false;
+
+    int i;
+    int* permutation = malloc(G1->order * sizeof(int));
+    for(i=0; i < G1->order; i++) permutation[i] = i;
+
+    do {
+
+        if(isomap(G1, G2, permutation, rep)) {
+            memcpy(mapping, permutation, G1->order * sizeof(int));
+            isomorphic = true;
+            return isomorphic;
+        }
+
+    } while(next_permutation(permutation, G1->order));
+
+    free(permutation);
 
     return isomorphic;
 }
