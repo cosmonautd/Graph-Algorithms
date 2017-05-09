@@ -53,11 +53,11 @@ int* multmatrix(int* M1, int* M2, int len) {
     return tmp;
 }
 
-bool equals_adjmatrix(int* adjmatrix1, int* adjmatrix2, int len) {
+bool equals_matrix(int* matrix1, int* matrix2, int rowsize, int collumnsize) {
     int i, j;
-    for(i=0; i < len; i++)
-        for(j=0; j < len; j++)
-            if(adjmatrix1[get_index(i, j, len)] != adjmatrix2[get_index(i, j, len)])
+    for(i=0; i < rowsize; i++)
+        for(j=0; j < collumnsize; j++)
+            if(matrix1[get_index(i, j, collumnsize)] != matrix2[get_index(i, j, collumnsize)])
                 return false;
     return true;
 }
@@ -78,7 +78,7 @@ bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
             int* tmp = multmatrix(pmatrix, G1->ADJ_MATRIX, G1->order);
             tmp = multmatrix(tmp, ptmatrix, G1->order);
 
-            bool output = equals_adjmatrix(tmp, G2->ADJ_MATRIX, G2->order);
+            bool output = equals_matrix(tmp, G2->ADJ_MATRIX, G2->order, G2->order);
 
             free(pmatrix);
             free(ptmatrix);
@@ -88,7 +88,21 @@ bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
         }
 
         case USE_INC_MATRIX: {
-            break;
+
+            int i, j;
+            for(i=0; i < G2->size; i++) {
+                int v1 = G2->EDGE_LIST[i].v1;
+                int v2 = G2->EDGE_LIST[i].v2;
+                bool match = false;
+                for(j=0; j < G1->size && !match; j++) {
+                    if(G1->INC_MATRIX[get_index(mapping[v1], j, G1->size)]
+                        && G1->INC_MATRIX[get_index(mapping[v2], j, G1->size)]) {
+                            match = true;
+                        }
+                }
+                if(!match) return false;
+            }
+            return true;
         }
 
         default: {
@@ -112,6 +126,7 @@ bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
 
         if(isomap(G1, G2, permutation, rep)) {
             memcpy(mapping, permutation, G1->order * sizeof(int));
+            //printv(mapping, G1->order);
             isomorphic = true;
             return isomorphic;
         }
