@@ -36,7 +36,7 @@ void isomorphism_example() {
 
     int* mapping = malloc(G1->order * sizeof(int));
 
-    if(isomorphic(G1, G2, mapping, USE_INC_MATRIX)) {
+    if(isomorphic(G1, G2, mapping, USE_ADJ_LISTS)) {
         printf("G1 and G2 are isomorphic\n\n");
         printf("f: G2->G1\n");
         int i;

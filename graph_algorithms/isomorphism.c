@@ -62,12 +62,80 @@ bool equals_matrix(int* matrix1, int* matrix2, int rowsize, int collumnsize) {
     return true;
 }
 
+// Função partition com escolha de pivô normal
+int partition(int *v, int start, int end) {
+    // Índice do pivô
+    int pivot_index = end-1;
+    // Pivô
+    int pivot = v[pivot_index];
+    /* Variável que guarda o índice do último valor menor ou igual ao pivô;
+       no fim, será a posição final do pivô*/
+    int pre = start-1;
+
+    /* Percorre o vetor, joga os valores menores que o pivô para a esquerda,
+       atualiza a posição final do pivô */
+    int i;
+    for(i=start; i < pivot_index; i++) {
+        if(v[i] <= pivot) {
+            pre++;
+            swap(v, i, pre);
+        }
+    }
+
+    // Define a posição final do pivô, troca o pivô para essa posição
+    pre++;
+    swap(v, pre, pivot_index);
+    return pre;
+}
+
+// Função quicksort
+void quicksort(int *v, int start, int end) {
+
+    if(start < end) {
+
+        int pos;
+
+        pos = partition(v, start, end);
+
+        // Chama recursivamente quicksort p/ lados esquerdo e direito do vetor
+        quicksort(v, start, pos);
+        quicksort(v, pos+1, end);
+    }
+}
+
 bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
 
     switch (rep) {
 
         case USE_ADJ_LISTS: {
-            break;
+
+            int i, j;
+
+            bool output = true;
+
+            int* inv_mapping = malloc(G1->order * sizeof(int));
+            for(i=0; i < G1->order; i++) inv_mapping[mapping[i]] = i;
+
+            for(i=0; i < G1->order && output; i++) {
+
+                int vertex_degree = get_vertex_degree(mapping[i], G1);
+                int* tmp = malloc(vertex_degree * sizeof(int));
+                for(j=0; j < vertex_degree; j++) {
+                    tmp[j] = inv_mapping[G1->ADJ_LISTS[mapping[i]][j]];
+                }
+
+                quicksort(tmp, 0, vertex_degree);
+
+                for(j=0; j < vertex_degree && output; j++) {
+                    if(tmp[j] != G2->ADJ_LISTS[i][j]) output = false;
+                }
+
+                free(tmp);
+            }
+
+            free(inv_mapping);
+
+            return output;
         }
 
         case USE_ADJ_MATRIX: {

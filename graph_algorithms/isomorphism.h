@@ -15,6 +15,8 @@ bool next_permutation(int* v, int len);
 int* getpmatrix(int* mapping, int len, bool transpose);
 int* multmatrix(int* M1, int* M2, int len);
 bool equals_matrix(int* matrix1, int* matrix2, int rowsize, int collumnsize);
+int partition(int *v, int start, int end);
+void quicksort(int *v, int start, int end);
 bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep);
 bool isomorphic(struct Graph* G1, struct Graph* G2, int* mapping, int rep);
 
