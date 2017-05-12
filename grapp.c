@@ -68,16 +68,18 @@ void strongly_connected_components_example() {
 
 void kruskal_example() {
 
-    struct Graph* G = new_graph_from_file("graph_files/G1.graph");
+    struct Graph* G = new_graph_from_file("graph_files/G9.graph");
     print_graph_info(G);
 
     printf("\n************************************************************\n");
     printf("************************************************************\n\n");
 
     struct Graph* T = kruskal(G);
+    printf("A mimimum spanning tree computed by Kruskal's Algorithm:\n\n");
+    print_graph_info(T);
 }
 
 void main() {
 
-    strongly_connected_components_example();
+    kruskal_example();
 }

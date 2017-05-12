@@ -52,10 +52,32 @@ struct Graph* kruskal(struct Graph* G) {
 
     assert(!G->oriented);
 
+    int i;
+
     int* empty_adj_matrix = calloc(G->order * G->order, sizeof(int));
     struct Graph* T = new_graph(G->V, empty_adj_matrix, G->order);
 
     free(empty_adj_matrix);
 
     struct Edge *sorted_edges = sort_edges(G);
+
+    struct UnionFind** ufv = malloc(G->order * sizeof(struct UnionFind*));
+    for(i=0; i < G->order; i++) {
+        ufv[i] = malloc(sizeof(struct UnionFind));
+        MakeSet(ufv[i]);
+    }
+
+    DEBUG_MESSAGE(("\n"));
+    for(i=0; i < G->size; i++) {
+        int v1 = sorted_edges[i].v1;
+        int v2 = sorted_edges[i].v2;
+        int weight = sorted_edges[i].weight;
+        if(Find(ufv[v1]) != Find(ufv[v2])) {
+            DEBUG_MESSAGE(("Adding edge %d-%d, with weight %d\n", v1, v2, weight));
+            add_edge(T, v1, v2, weight);
+            Union(ufv[v1], ufv[v2]);
+        }
+    }
+
+    return T;
 }
