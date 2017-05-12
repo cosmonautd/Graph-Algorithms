@@ -29,7 +29,7 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
             }
     }
 
-    DEBUG_MESSAGE(("Checking directness...\n"));
+    DEBUG_MESSAGE(("Checking if oriented...\n"));
     for(i=0; i < G->order && !G->oriented; i++) {
         for(j=i+1; j < G->order && !G->oriented; j++){
             if(G->ADJ_MATRIX[get_index(i,j,G->order)] != G->ADJ_MATRIX[get_index(j,i,G->order)])
@@ -283,8 +283,8 @@ void print_graph_info(struct Graph* G) {
 
     printf("\n");
 
-    if(connected(G, DEPTH_FIRST, USE_INC_MATRIX))
-    //if(connected(G, BREADTH_FIRST, USE_INC_MATRIX))
+    if(connected(G, DEPTH_FIRST, USE_ADJ_MATRIX))
+    //if(connected(G, BREADTH_FIRST, USE_ADJ_MATRIX))
         printf("Connected\n");
     else printf("Not Connected\n");
 
@@ -350,6 +350,25 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
         G->ADJ_LISTS[v2][d2] = v1;
 
         G->size++;
+
+        struct Edge* tmp_edgelist = malloc(G->size * sizeof(struct Edge));
+        memcpy(tmp_edgelist, G->EDGE_LIST, (G->size - 1) * sizeof(struct Edge));
+        tmp_edgelist[G->size - 1].v1 = v1;
+        tmp_edgelist[G->size - 1].v2 = v2;
+        tmp_edgelist[G->size - 1].weight = weight;
+
+        free(G->EDGE_LIST);
+        G->EDGE_LIST = tmp_edgelist;
+
+        int i;
+        int* tmp = calloc(G->order * G->size, sizeof(int));
+        for(i=0; i < G->size; i++) {
+            tmp[get_index(G->EDGE_LIST[i].v1, i, G->size)] = 1;
+            tmp[get_index(G->EDGE_LIST[i].v2, i, G->size)] = 1;
+        }
+
+        free(G->INC_MATRIX);
+        G->INC_MATRIX = tmp;
 
     } else {
 
