@@ -26,6 +26,28 @@ struct Edge* sort_edges(struct Graph* G) {
     return edges;
 }
 
+void MakeSet(struct UnionFind* x) {
+    x->parent = x;
+    x->rank = 0;
+}
+
+struct UnionFind* Find(struct UnionFind* x) {
+    if(x->parent != x) x->parent = Find(x->parent);
+    return x->parent;
+}
+
+void Union(struct UnionFind* x, struct UnionFind* y) {
+    struct UnionFind* xroot = Find(x);
+    struct UnionFind* yroot = Find(y);
+    if(xroot == yroot) return;
+    if(xroot->rank < yroot->rank) xroot->parent = yroot;
+    else if(xroot->rank > yroot->rank) yroot->parent = xroot;
+    else {
+        yroot->parent = xroot;
+        xroot->rank++;
+    }
+}
+
 struct Graph* kruskal(struct Graph* G) {
 
     assert(!G->oriented);
