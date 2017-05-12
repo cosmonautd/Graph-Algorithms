@@ -151,6 +151,7 @@ void bfs(struct Graph* G, int v, int* aux, int rep) {
         }
     }
 
+    DEBUG_MESSAGE(("Finished BFS Traversal\n"));
     free(Q);
 }
 
@@ -210,55 +211,119 @@ bool connected(struct Graph* G, int algorithm, int rep) {
 
 struct Component* connected_components(struct Graph* G) {
 
-    assert(!G->oriented);
+    if(!G->oriented) {
 
-    int i;
-    int k = 0;
-    int visited = 0;
+        int i;
+        int k = 0;
+        int visited = 0;
 
-    struct Component* root = malloc(sizeof(struct Component));
-    struct Component* conn = root;
-    conn->order = 0;
-    conn->next = NULL;
+        struct Component* root = malloc(sizeof(struct Component));
+        struct Component* conn = root;
+        conn->order = 0;
+        conn->next = NULL;
 
-    int start = 0;
-    int* visited_global = calloc(G->order, sizeof(int));
+        int start = 0;
+        int* visited_global = calloc(G->order, sizeof(int));
 
-    do {
+        do {
 
-        int* visited_local = calloc(G->order, sizeof(int));
+            int* visited_local = calloc(G->order, sizeof(int));
 
-        bfs(G, start, visited_local, USE_ADJ_LISTS);
-        for(i=0; i < G->order; i++) if(visited_local[i] == 1) conn->order++;
-        conn->elements = malloc(conn->order * sizeof(int));
+            bfs(G, start, visited_local, USE_ADJ_LISTS);
+            for(i=0; i < G->order; i++) if(visited_local[i] == 1) conn->order++;
+            conn->elements = malloc(conn->order * sizeof(int));
 
-        for(i=0; i < G->order; i++) if(visited_local[i] == 1) {
-            visited_global[i] = 1;
-            conn->elements[k++] = i;
+            for(i=0; i < G->order; i++) if(visited_local[i] == 1) {
+                visited_global[i] = 1;
+                conn->elements[k++] = i;
+            }
+
+            visited += conn->order;
+
+            for(i=0; i < G->order; i++) if(visited_global[i] == 0) { start = i; break; }
+
+            if(visited < G->order) {
+                conn->next = malloc(sizeof(struct Component));
+                conn = conn->next;
+                conn->order = 0;
+                conn->next = NULL;
+                k = 0;
+            }
+
+            free(visited_local);
+
+        } while(visited < G->order);
+
+        conn = NULL;
+
+        free(visited_global);
+        free(conn);
+
+        return root;
+
+    } else {
+
+        int i, j;
+        int visited = 0;
+
+        struct Component* root = malloc(sizeof(struct Component));
+        struct Component* conn = root;
+        conn->order = 0;
+        conn->next = NULL;
+
+        int* visited_global = calloc(G->order, sizeof(int));
+        int** conmatrix = malloc(G->order * sizeof(int*));
+
+        for(i=0; i < G->order; i++) {
+            conmatrix[i] = calloc(G->order, sizeof(int*));
+            bfs(G, i, conmatrix[i], USE_ADJ_LISTS);
         }
 
-        visited += conn->order;
+        for(i=0; i < G->order; i++) {
 
-        for(i=0; i < G->order; i++) if(visited_global[i] == 0) { start = i; break; }
+            if(!visited_global[i]){
 
-        if(visited < G->order) {
-            conn->next = malloc(sizeof(struct Component));
-            conn = conn->next;
-            conn->order = 0;
-            conn->next = NULL;
-            k = 0;
+                conn->order++;
+                for(j=0; j < G->order; j++) {
+                    if(conmatrix[i][j] && conmatrix[j][i] && i != j) {
+                        conn->order++;
+                    }
+                }
+
+                visited += conn->order;
+
+                conn->elements = malloc(conn->order * sizeof(int));
+
+                int k = 0;
+                visited_global[i] = 1;
+                conn->elements[k++] = i;
+
+                for(j=0; j < G->order; j++) {
+                    if(conmatrix[i][j] && conmatrix[j][i] && i != j) {
+                        visited_global[j] = 1;
+                        conn->elements[k++] = j;
+                    }
+                }
+
+                if(visited < G->order) {
+                    conn->next = malloc(sizeof(struct Component));
+                    conn = conn->next;
+                    conn->order = 0;
+                    conn->next = NULL;
+                }
+            }
         }
 
-        free(visited_local);
+        conn = NULL;
 
-    } while(visited < G->order);
+        free(visited_global);
+        free(conn);
 
-    conn = NULL;
+        for(i=0; i < G->order; i++) free(conmatrix[i]);
+        free(conmatrix);
 
-    free(visited_global);
-    free(conn);
-
-    return root;
+        return root;
+    }
 }
 
 int count_connected_components(struct Component* component) {

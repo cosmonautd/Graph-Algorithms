@@ -49,6 +49,23 @@ void isomorphism_example() {
     free(mapping);
 }
 
+void strongly_connected_components_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+    print_graph_info(G);
+
+    printf("\n************************************************************\n");
+    printf("************************************************************\n\n");
+
+    struct Component* component = connected_components(G);
+
+    printf("Found %d strongly connected components\n\n", count_connected_components(component));
+    print_connected_components(component);
+
+    free_graph(G);
+    free_component(component);
+}
+
 void kruskal_example() {
 
     struct Graph* G = new_graph_from_file("graph_files/G1.graph");
@@ -62,5 +79,5 @@ void kruskal_example() {
 
 void main() {
 
-    isomorphism_example();
+    strongly_connected_components_example();
 }
