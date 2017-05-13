@@ -92,7 +92,25 @@ void prim_example() {
     print_graph_info(T);
 }
 
+void random_graphs_example() {
+
+    struct Graph* G1 = new_random_graph(20, 0.1, 0, 100);
+    print_graph_info(G1);
+
+    printf("\n************************************************************\n");
+    printf("************************************************************\n\n");
+
+    struct Graph* G2 = new_random_graph(20, 0.5, 0, 100);
+    print_graph_info(G2);
+
+    printf("\n************************************************************\n");
+    printf("************************************************************\n\n");
+
+    struct Graph* G3 = new_random_graph(20, 0.9, 0, 100);
+    print_graph_info(G3);
+}
+
 void main() {
 
-    prim_example();
+    random_graphs_example();
 }

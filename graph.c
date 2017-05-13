@@ -105,6 +105,29 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
     return G;
 }
 
+struct Graph* new_random_graph(int n, float p, int min_weight, int max_weight) {
+
+    int i, j;
+    int* vertices = malloc(n * sizeof(int));
+    int* adj_matrix = calloc(n * n, sizeof(int));
+
+    srand(time(NULL));
+
+    for(i=0; i < n; i++) {
+        vertices[i] = i;
+        for(j=i+1; j < n; j++) {
+            int random = rand() % 100;
+            if(random < p*100) {
+                int random_weight = min_weight + rand() % (max_weight - min_weight + 1);
+                adj_matrix[get_index(i, j, n)] = random_weight;
+                adj_matrix[get_index(j, i, n)] = random_weight;
+            }
+        }
+    }
+
+    return new_graph(vertices, adj_matrix, n);
+}
+
 /*  Função graph_from_file()
     Realiza a leitura do arquivo de caminho path e preenche a estrutura Graph,
     cujo endereço é dado pelo ponteiro G.
