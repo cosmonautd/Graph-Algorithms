@@ -45,6 +45,7 @@ struct Graph {
 #include "graph_algorithms/connectivity.h"
 #include "graph_algorithms/isomorphism.h"
 #include "graph_algorithms/kruskal.h"
+#include "graph_algorithms/prim.h"
 
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order);
 struct Graph* new_graph_from_file(const char* path);

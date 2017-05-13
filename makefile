@@ -1,5 +1,5 @@
-app: graph connectivity isomorphism kruskal
-	gcc -g -o grapp grapp.c graph.o connectivity.o isomorphism.o kruskal.o
+app: graph connectivity isomorphism kruskal prim
+	gcc -g -o grapp grapp.c graph.o connectivity.o isomorphism.o kruskal.o prim.o
 
 install:
 	cp grapp /usr/bin
@@ -19,6 +19,9 @@ isomorphism:
 
 kruskal:
 	gcc -c graph_algorithms/kruskal.c
+
+prim:
+	gcc -c graph_algorithms/prim.c
 
 clean:
 	if [ -f grapp ] ; then rm grapp ; fi
