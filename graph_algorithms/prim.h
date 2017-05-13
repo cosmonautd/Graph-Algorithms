@@ -3,6 +3,6 @@
 
 #include "../graph.h"
 
-
+struct Graph* prim(struct Graph* G);
 
 #endif

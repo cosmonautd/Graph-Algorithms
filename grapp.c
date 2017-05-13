@@ -79,7 +79,20 @@ void kruskal_example() {
     print_graph_info(T);
 }
 
+void prim_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G9.graph");
+    print_graph_info(G);
+
+    printf("\n************************************************************\n");
+    printf("************************************************************\n\n");
+
+    struct Graph* T = prim(G);
+    printf("A mimimum spanning tree computed by Prim's Algorithm:\n\n");
+    print_graph_info(T);
+}
+
 void main() {
 
-    kruskal_example();
+    prim_example();
 }
