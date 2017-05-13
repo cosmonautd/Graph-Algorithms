@@ -137,6 +137,13 @@ void prim_kruskal_benchmark() {
     int i;
     int v = 40;
     int n = 1000;
+    float sd = 0.1;
+    float dd = 0.9;
+
+    printf("Prim and Kruskal Benchmark\n");
+    printf("%d random graphs, %d vertices each\n", n, v);
+    printf("Sparse graphs density: %.2f\n", sd);
+    printf("Dense  graphs density: %.2f\n", dd);
 
     unsigned long* prim_sparse = malloc(n*sizeof(int));
     unsigned long* prim_dense  = malloc(n*sizeof(int));
@@ -148,10 +155,10 @@ void prim_kruskal_benchmark() {
         struct Graph* G1;
         struct Graph* G2;
 
-        do { G1 = new_random_graph(v, 0.2, 0, 100); }
+        do { G1 = new_random_graph(v, sd, 0, 100); }
         while(!connected(G1, DEPTH_FIRST, USE_ADJ_LISTS));
 
-        do { G2 = new_random_graph(v, 0.9, 0, 100); }
+        do { G2 = new_random_graph(v, dd, 0, 100); }
         while(!connected(G2, DEPTH_FIRST, USE_ADJ_LISTS));
 
         unsigned long *timer = malloc(sizeof(unsigned long));
