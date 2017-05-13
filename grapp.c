@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "graph.h"
 
@@ -110,7 +111,89 @@ void random_graphs_example() {
     print_graph_info(G3);
 }
 
+void prim_kruskal_benchmark() {
+
+    void start_timer(unsigned long *timer) {
+        struct timeval tv_start;
+        gettimeofday(&tv_start, NULL);
+        *timer = 1000000 * tv_start.tv_sec + tv_start.tv_usec;
+    }
+
+    void end_timer(unsigned long *timer) {
+        struct timeval tv_end;
+        gettimeofday(&tv_end, NULL);
+        *timer = 1000000 * tv_end.tv_sec + tv_end.tv_usec - *timer;
+    }
+
+    int i;
+    int v = 40;
+    int n = 1000;
+
+    unsigned long* prim_sparse = malloc(n*sizeof(int));
+    unsigned long* prim_dense  = malloc(n*sizeof(int));
+    unsigned long* kruskal_sparse = malloc(n*sizeof(int));
+    unsigned long* kruskal_dense  = malloc(n*sizeof(int));
+
+    for(i=0; i < n; i++) {
+
+        struct Graph* G1;
+        struct Graph* G2;
+
+        do { G1 = new_random_graph(v, 0.2, 0, 100); }
+        while(!connected(G1, DEPTH_FIRST, USE_ADJ_LISTS));
+
+        do { G2 = new_random_graph(v, 0.9, 0, 100); }
+        while(!connected(G2, DEPTH_FIRST, USE_ADJ_LISTS));
+
+        unsigned long *timer = malloc(sizeof(unsigned long));
+
+        start_timer(timer);
+        struct Graph* T1 = prim(G1);
+        end_timer(timer);
+        prim_sparse[i] = *timer;
+
+        start_timer(timer);
+        struct Graph* T2 = prim(G2);
+        end_timer(timer);
+        prim_dense[i] = *timer;
+
+        start_timer(timer);
+        struct Graph* T3 = kruskal(G1);
+        end_timer(timer);
+        kruskal_sparse[i] = *timer;
+
+        start_timer(timer);
+        struct Graph* T4 = kruskal(G2);
+        end_timer(timer);
+        kruskal_dense[i] = *timer;
+    }
+
+    unsigned long prim_sparse_avg = 0;
+    unsigned long prim_dense_avg  = 0;
+    unsigned long kruskal_sparse_avg = 0;
+    unsigned long kruskal_dense_avg  = 0;
+
+    for(i=0; i < n; i++) {
+        prim_sparse_avg += prim_sparse[i];
+        prim_dense_avg  += prim_dense[i];
+        kruskal_sparse_avg += kruskal_sparse[i];
+        kruskal_dense_avg  += kruskal_dense[i];
+    }
+
+    prim_sparse_avg /= n;
+    prim_dense_avg  /= n;
+    kruskal_sparse_avg /= n;
+    kruskal_dense_avg  /= n;
+
+    printf("--------------------------------------------------\n");
+    printf("|  Graph/Algorithm  |     Prim     |   Kruskal   |\n");
+    printf("|----------------------------------|-------------|\n");
+    printf("|      Sparse       |  %6lu us   | %6lu us   |\n", prim_sparse_avg, kruskal_sparse_avg);
+    printf("|      Dense        |  %6lu us   | %6lu us   |\n", prim_dense_avg, kruskal_dense_avg);
+    printf("--------------------------------------------------\n");
+}
+
 void main() {
 
-    random_graphs_example();
+    prim_kruskal_benchmark();
 }
