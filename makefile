@@ -1,4 +1,4 @@
-app: graph connectivity isomorphism kruskal prim
+grapp: graph connectivity isomorphism kruskal prim
 	gcc -g -o grapp grapp.c graph.o connectivity.o isomorphism.o kruskal.o prim.o
 
 install:
