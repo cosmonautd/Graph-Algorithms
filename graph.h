@@ -37,7 +37,7 @@ struct Graph {
     int* ADJ_MATRIX;
     int* INC_MATRIX;
     int** ADJ_LISTS;
-    struct Edge* EDGE_LIST;
+    struct Edge* E;
     int order;
     int size;
     bool oriented;
@@ -58,6 +58,9 @@ void print_adj_matrix(struct Graph* G);
 void print_inc_matrix(struct Graph* G);
 void print_adj_lists(struct Graph* G);
 void print_graph_info(struct Graph* G);
+void generate_dotfile(struct Graph* G, const char* filename, int* v_highlight);
+void graphviz_show(struct Graph* G);
+void graphviz_show_v(struct Graph* G, int* v_highlight);
 int get_graph_order(struct Graph* G);
 int get_graph_size(struct Graph* G);
 bool oriented(struct Graph* G);

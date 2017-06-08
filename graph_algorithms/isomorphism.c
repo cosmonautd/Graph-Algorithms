@@ -159,8 +159,8 @@ bool isomap(struct Graph* G1, struct Graph* G2, int* mapping, int rep) {
 
             int i, j;
             for(i=0; i < G2->size; i++) {
-                int v1 = G2->EDGE_LIST[i].v1;
-                int v2 = G2->EDGE_LIST[i].v2;
+                int v1 = G2->E[i].v1;
+                int v2 = G2->E[i].v2;
                 bool match = false;
                 for(j=0; j < G1->size && !match; j++) {
                     if(G1->INC_MATRIX[get_index(mapping[v1], j, G1->size)]

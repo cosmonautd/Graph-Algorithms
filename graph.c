@@ -49,30 +49,30 @@ struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order) {
                     G->size++;
 
     DEBUG_MESSAGE(("Generating edge list...\n"));
-    G->EDGE_LIST = malloc(G->size*sizeof(struct Edge));
+    G->E = malloc(G->size*sizeof(struct Edge));
     if(!G->oriented) {
         for(i=0, k=0; i < G->order; i++)
             for(j=i+1; j < G->order; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0) {
-                    G->EDGE_LIST[k].v1 = i;
-                    G->EDGE_LIST[k].v2 = j;
-                    G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
+                    G->E[k].v1 = i;
+                    G->E[k].v2 = j;
+                    G->E[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
                 }
     } else {
         for(i=0, k=0; i < G->order; i++)
             for(j=0; j < G->order; j++)
                 if(G->ADJ_MATRIX[get_index(i,j,G->order)] != 0 && i != j) {
-                    G->EDGE_LIST[k].v1 = i;
-                    G->EDGE_LIST[k].v2 = j;
-                    G->EDGE_LIST[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
+                    G->E[k].v1 = i;
+                    G->E[k].v2 = j;
+                    G->E[k++].weight = G->ADJ_MATRIX[get_index(i,j,G->order)];
                 }
     }
 
     DEBUG_MESSAGE(("Generating Incidence Matrix...\n"));
     G->INC_MATRIX = calloc(G->order * G->size, sizeof(int));
     for(i=0; i < G->size; i++) {
-        G->INC_MATRIX[get_index(G->EDGE_LIST[i].v1, i, G->size)] = 1;
-        G->INC_MATRIX[get_index(G->EDGE_LIST[i].v2, i, G->size)] = 1;
+        G->INC_MATRIX[get_index(G->E[i].v1, i, G->size)] = 1;
+        G->INC_MATRIX[get_index(G->E[i].v2, i, G->size)] = 1;
     }
 
     DEBUG_MESSAGE(("Generated vertices:\n\n"));
@@ -317,6 +317,67 @@ void print_graph_info(struct Graph* G) {
     printf("Graph size: %d\n", get_graph_size(G));
 }
 
+/*  Função generate_dotfile()
+    Gera um arquivo de representação de grafo que pode ser desenhado com graphviz
+*/
+void generate_dotfile(struct Graph* G, const char* filename, int* v_highlight) {
+
+    FILE* dotfile;
+	dotfile = fopen(filename, "w");
+
+	if(dotfile != NULL) {
+	    DEBUG_MESSAGE(("File opened successfully\n"));
+	}
+	else {
+	    printf("Error opening file: %s\n", filename);
+	    exit(EXIT_FAILURE);
+	}
+
+	if(oriented(G)) fputs("digraph {\n", dotfile);
+	else fputs("graph {\n", dotfile);
+
+	fputs("node[shape=circle]\n", dotfile);
+
+	int i;
+	for(i=0; i < G->order; i++) {
+		char v[100];
+		snprintf(v, 100, "%d", G->V[i]);
+		fputs(v, dotfile);
+		if(v_highlight[i]) fputs(" [style = filled, fillcolor = \"#82A5C5\"]", dotfile);
+		fputs(";\n", dotfile);
+	}
+
+	for(i=0; i < G->size; i++) {
+		char v1[100];
+		char v2[100];
+		snprintf(v1, 100, "%d", G->E[i].v1);
+		snprintf(v2, 100, "%d", G->E[i].v2);
+		fputs(v1, dotfile);
+		if(oriented(G)) fputs("->", dotfile);
+		else fputs("--", dotfile);
+		fputs(v2, dotfile);
+		fputs(";\n", dotfile);
+	}
+
+	fputs("}", dotfile);
+	fclose(dotfile);
+}
+
+void graphviz_show(struct Graph* G) {
+	int* v_highlight = calloc(G->order, sizeof(int));
+	generate_dotfile(G, "G.gv", v_highlight);
+	system("dot G.gv -Tpng -o G.png");
+	system("feh G.png");
+	system("rm G.gv G.png");
+}
+
+void graphviz_show_v(struct Graph* G, int* v_highlight) {
+	generate_dotfile(G, "G.gv", v_highlight);
+	system("dot G.gv -Tpng -o G.png");
+	system("feh G.png");
+	system("rm G.gv G.png");
+}
+
 /*  Função get_graph_order()
     Retorna a ordem do grafo G.
 */
@@ -375,19 +436,19 @@ void add_edge(struct Graph* G, int v1, int v2, int weight) {
         G->size++;
 
         struct Edge* tmp_edgelist = malloc(G->size * sizeof(struct Edge));
-        memcpy(tmp_edgelist, G->EDGE_LIST, (G->size - 1) * sizeof(struct Edge));
+        memcpy(tmp_edgelist, G->E, (G->size - 1) * sizeof(struct Edge));
         tmp_edgelist[G->size - 1].v1 = v1;
         tmp_edgelist[G->size - 1].v2 = v2;
         tmp_edgelist[G->size - 1].weight = weight;
 
-        free(G->EDGE_LIST);
-        G->EDGE_LIST = tmp_edgelist;
+        free(G->E);
+        G->E = tmp_edgelist;
 
         int i;
         int* tmp = calloc(G->order * G->size, sizeof(int));
         for(i=0; i < G->size; i++) {
-            tmp[get_index(G->EDGE_LIST[i].v1, i, G->size)] = 1;
-            tmp[get_index(G->EDGE_LIST[i].v2, i, G->size)] = 1;
+            tmp[get_index(G->E[i].v1, i, G->size)] = 1;
+            tmp[get_index(G->E[i].v2, i, G->size)] = 1;
         }
 
         free(G->INC_MATRIX);
@@ -414,6 +475,6 @@ void free_graph(struct Graph* G) {
     free(G->INC_MATRIX);
     for(i=0; i < G->order; i++) free(G->ADJ_LISTS[i]);
     free(G->ADJ_LISTS);
-    free(G->EDGE_LIST);
+    free(G->E);
     free(G);
 }

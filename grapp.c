@@ -209,7 +209,21 @@ void prim_kruskal_benchmark() {
     printf("--------------------------------------------------\n");
 }
 
+void graph_show_example() {
+
+	struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+	print_graph_info(G);
+	graphviz_show(G);
+
+	int* v_highlight = calloc(G->order, sizeof(int));
+	v_highlight[0] = 1;
+	v_highlight[1] = 1;
+	v_highlight[3] = 1;
+	v_highlight[4] = 1;
+	graphviz_show_v(G, v_highlight);
+}
+
 void main() {
 
-    prim_kruskal_benchmark();
+    graph_show_example();
 }

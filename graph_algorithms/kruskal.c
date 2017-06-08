@@ -14,7 +14,7 @@ struct Edge* sort_edges(struct Graph* G) {
     int i, j, k = 0;
 
     struct Edge* edges = malloc(G->size * sizeof(struct Edge));
-    memcpy(edges, G->EDGE_LIST, G->size * sizeof(struct Edge));
+    memcpy(edges, G->E, G->size * sizeof(struct Edge));
 
     DEBUG_MESSAGE(("\nSorting Edges...\n"));
     qsort(edges, G->size, sizeof(struct Edge), edge_weight_comparator);
