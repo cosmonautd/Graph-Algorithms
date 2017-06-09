@@ -1,5 +1,5 @@
-grapp: graph connectivity isomorphism kruskal prim
-	gcc -g -o grapp grapp.c graph.o connectivity.o isomorphism.o kruskal.o prim.o
+grapp: graph connectivity isomorphism spanningtrees
+	gcc -g -o grapp grapp.c graph.o connectivity.o isomorphism.o spanningtrees.o
 
 install:
 	cp grapp /usr/bin
@@ -17,11 +17,8 @@ connectivity:
 isomorphism:
 	gcc -c graph_algorithms/isomorphism.c
 
-kruskal:
-	gcc -c graph_algorithms/kruskal.c
-
-prim:
-	gcc -c graph_algorithms/prim.c
+spanningtrees:
+	gcc -c graph_algorithms/spanningtrees.c
 
 clean:
 	if [ -f grapp ] ; then rm grapp ; fi

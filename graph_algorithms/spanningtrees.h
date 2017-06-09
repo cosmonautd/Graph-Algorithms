@@ -15,5 +15,6 @@ void Union(struct UnionFind* x, struct UnionFind* y);
 int edge_weight_comparator(const void *x, const void *y);
 struct Edge* sort_edges(struct Graph* G);
 struct Graph* kruskal(struct Graph* G);
+struct Graph* prim(struct Graph* G);
 
 #endif
