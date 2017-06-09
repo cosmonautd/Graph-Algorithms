@@ -1,5 +1,5 @@
-#ifndef KRUSKAL_H_
-#define KRUSKAL_H_
+#ifndef SPANNINGTREES_H_
+#define SPANNINGTREES_H_
 
 #include "../graph.h"
 

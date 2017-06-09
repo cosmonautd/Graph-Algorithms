@@ -46,6 +46,7 @@ struct Graph {
 #include "graph_algorithms/connectivity.h"
 #include "graph_algorithms/isomorphism.h"
 #include "graph_algorithms/spanningtrees.h"
+#include "graph_algorithms/shortestpaths.h"
 
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order);
 struct Graph* new_random_graph(int order, float p, int min_weight, int max_weight);
