@@ -1,11 +1,5 @@
 #include "isomorphism.h"
 
-void printv(int *v, int len) {
-    int i;
-    for(i=0; i < len; i++) printf("%d ", v[i]);
-    printf("\n");
-}
-
 void swap(int* v, int x, int y) {
     int tmp = v[y];
     v[y] = v[x];

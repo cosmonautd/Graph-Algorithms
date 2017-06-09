@@ -3,10 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <time.h>
+#include <stdint.h>
 
 /*  Define se o programa é compilado com impressão de linhas de debug
 */
@@ -51,6 +52,7 @@ struct Graph {
 struct Graph* new_graph(int* V, int* ADJ_MATRIX, int order);
 struct Graph* new_random_graph(int order, float p, int min_weight, int max_weight);
 struct Graph* new_graph_from_file(const char* path);
+void printv(int *v, int len);
 int get_index(int i, int j, int rowsize);
 int get_vertex_degree(int vertex, struct Graph* G);
 void print_vertices(struct Graph* G);

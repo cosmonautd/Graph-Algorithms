@@ -223,7 +223,28 @@ void graph_show_example() {
 	graphviz_show_v(G, v_highlight);
 }
 
+void bellmanford_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+	print_graph_info(G);
+
+    int* d = malloc(G->order * sizeof(int));
+    int* p = malloc(G->order * sizeof(int));
+
+    if(bellmanford(G, 0, d, p)) {
+        printf("\nResults of Bellman-Ford algorithm\n");
+        printf("\nShortest path distances:\n");
+        printv(d, G->order);
+        printf("\nShortest path predecesssors:\n");
+        printv(p, G->order);
+    } else {
+        printf("\nSorry. Can't computer answer. Graph has negative-weight cycle\n");
+    }
+
+    graphviz_show(G);
+}
+
 void main() {
 
-    graph_show_example();
+    bellmanford_example();
 }

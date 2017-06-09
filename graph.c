@@ -231,6 +231,13 @@ struct Graph* new_graph_from_file(const char* path) {
     return new_graph(V, ADJ_MATRIX, n_vertices);
 }
 
+// Função para impressão de um vetor v, de comprimento len
+void printv(int *v, int len) {
+    int i;
+    for(i=0; i < len; i++) printf("%d ", v[i]);
+    printf("\n");
+}
+
 /*  Função get_index()
     Dados os índices i, j e o comprimento das linhas de uma matriz
     bidimensional, retorna o índice equivalente em uma representação da matriz

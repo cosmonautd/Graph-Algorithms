@@ -9,7 +9,6 @@
 #define USE_INC_MATRIX  4
 #endif
 
-void printv(int *v, int len);
 void swap(int* v, int x, int y);
 bool next_permutation(int* v, int len);
 int* getpmatrix(int* mapping, int len, bool transpose);
