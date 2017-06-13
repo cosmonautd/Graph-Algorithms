@@ -1,17 +1,17 @@
 #include "shortestpaths.h"
 
-void init_ss(struct Graph* G, int source, int* d, int* p) {
+void initss(struct Graph* G, int source, int* d, int* p) {
     int i;
     for(i=0; i < G->order; i++) {
-        d[i] = INT32_MAX;
-        p[i] = -1;
+        d[i] = INF;
+        p[i] = NONE;
     }
     d[source] = 0;
     p[source] = source;
 }
 
 void relax(int v1, int v2, int w, int* d, int* p) {
-    if(d[v2] > d[v1] + w) {
+    if(d[v1] + w < d[v2]) {
         d[v2] = d[v1] + w;
         p[v2] = v1;
     }
@@ -19,7 +19,7 @@ void relax(int v1, int v2, int w, int* d, int* p) {
 
 bool bellmanford(struct Graph* G, int source, int* d, int* p) {
 
-    init_ss(G, source, d, p);
+    initss(G, source, d, p);
 
     int i, j;
     for(i=1; i < G->order - 1; i++) {
