@@ -42,3 +42,70 @@ bool bellmanford(struct Graph* G, int source, int* d, int* p) {
 
     return true;
 }
+
+int minindex(int* v, int len) {
+    int min = v[0];
+    int index = 0;
+
+    int i;
+    for (i=1; i < len; i++) {
+        if (v[i] < min) {
+            min = v[i];
+            index = i;
+        }
+    }
+
+    return index;
+}
+
+void initvq(struct VertexQueue* vq, struct Graph* G) {
+    vq->V = malloc(G->order*sizeof(int));
+    vq->D = malloc(G->order*sizeof(int));
+    vq->len = 0;
+}
+
+void add2vq(struct VertexQueue* vq, int v, int d) {
+    vq->V[vq->len] = v;
+    vq->D[vq->len] = d;
+    vq->len++;
+}
+
+int extractvq(struct VertexQueue* vq) {
+    int index = minindex(vq->D, vq->len);
+    int v = vq->V[index];
+
+    int i;
+    for(i=index; i < vq->len - 1; i++) {
+        vq->V[i] = vq->V[i+1];
+        vq->D[i] = vq->D[i+1];
+    }
+
+    vq->len--;
+
+    return v;
+}
+
+bool dijkstra(struct Graph* G, int source, int* d, int* p) {
+
+    int i;
+    for(i=0; i < G->size; i++) if(G->E[i].weight < 0) return false;
+
+    initss(G, source, d, p);
+
+    struct VertexQueue* vq = malloc(sizeof(struct VertexQueue));
+    initvq(vq, G);
+    for(i=0; i < G->order; i++)
+        add2vq(vq, i, d[i]);
+
+    while(vq->len > 0) {
+        int v1 = extractvq(vq);
+        int v1_degree = get_vertex_degree(v1, G);
+        for(i=0; i < v1_degree; i++) {
+            int v2 = G->ADJ_LISTS[v1][i];
+            int w  = G->ADJ_MATRIX[get_index(v1, v2, G->order)];
+            relax(v1, v2, w, d, p);
+        }
+    }
+
+    return true;
+}

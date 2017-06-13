@@ -238,7 +238,28 @@ void bellmanford_example() {
         printf("\nShortest path predecesssors:\n");
         printv(p, G->order);
     } else {
-        printf("\nSorry. Can't computer answer. Graph has negative-weight cycle\n");
+        printf("\nSorry. Can't compute answer. Graph has negative-weight cycle\n");
+    }
+
+    graphviz_show(G);
+}
+
+void dijkstra_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+	print_graph_info(G);
+
+    int* d = malloc(G->order * sizeof(int));
+    int* p = malloc(G->order * sizeof(int));
+
+    if(dijkstra(G, 0, d, p)) {
+        printf("\nResults of Dijkstra algorithm\n");
+        printf("\nShortest path distances:\n");
+        printv(d, G->order);
+        printf("\nShortest path predecesssors:\n");
+        printv(p, G->order);
+    } else {
+        printf("\nSorry. Can't compute answer.\n");
     }
 
     graphviz_show(G);
@@ -246,5 +267,5 @@ void bellmanford_example() {
 
 void main() {
 
-    bellmanford_example();
+    dijkstra_example();
 }
