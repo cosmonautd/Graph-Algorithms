@@ -109,3 +109,30 @@ bool dijkstra(struct Graph* G, int source, int* d, int* p) {
 
     return true;
 }
+
+bool shortestpath(struct Graph* G, int source, int terminal, int* path, int* pathorder, int* d, int* p) {
+
+    int* pathtmp = malloc(G->order*sizeof(int));
+    *pathorder = 0;
+
+    int current = terminal;
+    while(current != source && current != NONE) {
+        pathtmp[*pathorder] = current;
+        *pathorder = *pathorder + 1;
+        current = p[current];
+    }
+
+    if(current == source) {
+        pathtmp[*pathorder] = current;
+        *pathorder = *pathorder + 1;
+    }
+    else {
+        if(current == NONE) return false;
+    }
+
+    int i;
+    path = realloc(path, (*pathorder)*sizeof(int));
+    for(i=*pathorder - 1; i > -1; i--) path[*pathorder-1-i] = pathtmp[i];
+
+    return true;
+}

@@ -19,5 +19,6 @@ void initvq(struct VertexQueue* vq, struct Graph* G);
 void add2vq(struct VertexQueue* vq, int v, int d);
 int extractvq(struct VertexQueue* vq);
 bool dijkstra(struct Graph* G, int source, int* d, int* p);
+bool shortestpath(struct Graph* G, int source, int terminal, int* path, int* pathorder, int* d, int* p);
 
 #endif

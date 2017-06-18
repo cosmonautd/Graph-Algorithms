@@ -212,7 +212,7 @@ void prim_kruskal_benchmark() {
 void graph_show_example() {
 
 	struct Graph* G = new_graph_from_file("graph_files/G8.graph");
-	print_graph_info(G);
+    print_graph_info(G);
 	graphviz_show(G);
 
 	int* v_highlight = calloc(G->order, sizeof(int));
@@ -226,7 +226,7 @@ void graph_show_example() {
 void bellmanford_example() {
 
     struct Graph* G = new_graph_from_file("graph_files/G8.graph");
-	print_graph_info(G);
+    print_graph_info(G);
 
     int* d = malloc(G->order * sizeof(int));
     int* p = malloc(G->order * sizeof(int));
@@ -247,7 +247,7 @@ void bellmanford_example() {
 void dijkstra_example() {
 
     struct Graph* G = new_graph_from_file("graph_files/G8.graph");
-	print_graph_info(G);
+    print_graph_info(G);
 
     int* d = malloc(G->order * sizeof(int));
     int* p = malloc(G->order * sizeof(int));
@@ -265,7 +265,48 @@ void dijkstra_example() {
     graphviz_show(G);
 }
 
+void shortestpath_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+    print_graph_info(G);
+
+    int source = 0;
+
+    int* d = malloc(G->order * sizeof(int));
+    int* p = malloc(G->order * sizeof(int));
+
+    if(dijkstra(G, source, d, p)) {
+        printf("\nResults of Single-Source Shortest Path algorithm\n");
+        printf("\nShortest path distances:\n");
+        printv(d, G->order);
+        printf("\nShortest path predecesssors:\n");
+        printv(p, G->order);
+    } else {
+        printf("\nSorry. Can't compute answer.\n");
+    }
+
+    int* path = malloc(G->order*sizeof(int));
+    int* pathorder = malloc(sizeof(int));
+
+    int terminal = 4;
+
+    printf("\nFinding a path from %d to %d\n", source, terminal);
+    if(shortestpath(G, source, terminal, path, pathorder, d, p)) {
+        printf("Path found\n");
+        printv(path, *pathorder);
+        printf("Length: %d\n", d[terminal]);
+
+        int i;
+        int* highlight = calloc(G->order, sizeof(int));
+        for(i=0; i < *pathorder; i++) highlight[path[i]] = 1;
+        graphviz_show_v(G, highlight);
+
+    } else {
+        printf("No path found\n");
+    }
+}
+
 void main() {
 
-    dijkstra_example();
+    shortestpath_example();
 }
