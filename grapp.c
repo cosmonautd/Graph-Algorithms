@@ -306,7 +306,40 @@ void shortestpath_example() {
     }
 }
 
+void allpairs_example() {
+
+    struct Graph* G = new_graph_from_file("graph_files/G8.graph");
+    print_graph_info(G);
+
+    int i, j;
+
+    int** d = malloc(G->order*sizeof(int*));
+    for(i=0; i < G->order; i++) {
+        d[i] = calloc(G->order, sizeof(int));
+    }
+
+    int** p = malloc(G->order*sizeof(int*));
+    for(i=0; i < G->order; i++) {
+        p[i] = malloc(G->order*sizeof(int));
+        for(j=0; j < G->order; j++) {
+            p[i][j] = NONE;
+        }
+    }
+
+    if(allpairs(G, d, p)) {
+        printf("\nResults of All-Pairs Shortest Paths algorithm\n");
+        printf("\nShortest path distances:\n");
+        for(i=0; i < G->order; i++) printv(d[i], G->order);
+        printf("\nShortest path predecesssors:\n");
+        for(i=0; i < G->order; i++) printv(p[i], G->order);
+    } else {
+        printf("\nSorry. Can't compute answer.\n");
+    }
+
+    graphviz_show(G);
+}
+
 void main() {
 
-    shortestpath_example();
+    allpairs_example();
 }

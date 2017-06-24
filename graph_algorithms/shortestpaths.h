@@ -5,6 +5,7 @@
 
 #define INF  INT32_MAX - 1
 #define NONE -1
+#define INFSUM(x, y) (((x) == (INF) || (y) == (INF)) ? (INF) : (x+y))
 
 struct VertexQueue {
     int* V;
@@ -20,5 +21,6 @@ void add2vq(struct VertexQueue* vq, int v, int d);
 int extractvq(struct VertexQueue* vq);
 bool dijkstra(struct Graph* G, int source, int* d, int* p);
 bool shortestpath(struct Graph* G, int source, int terminal, int* path, int* pathorder, int* d, int* p);
+bool allpairs(struct Graph* G, int** d, int** p);
 
 #endif
