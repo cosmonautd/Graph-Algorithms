@@ -22,5 +22,6 @@ int extractvq(struct VertexQueue* vq);
 bool dijkstra(struct Graph* G, int source, int* d, int* p);
 bool shortestpath(struct Graph* G, int source, int terminal, int* path, int* pathorder, int* d, int* p);
 bool allpairs(struct Graph* G, int** d, int** p);
+bool fasterallpairs(struct Graph* G, int** d)
 
 #endif

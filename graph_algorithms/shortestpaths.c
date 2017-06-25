@@ -199,3 +199,64 @@ bool allpairs(struct Graph* G, int** d, int** p) {
 
     return true;
 }
+
+bool fasterallpairs(struct Graph* G, int** d) {
+
+    int i, j, k, l;
+
+    int** W = malloc(G->order*sizeof(int*));
+    for(i=0; i < G->order; i++) {
+        W[i] = malloc(G->order*sizeof(int));
+        for(j=0; j < G->order; j++) {
+            if(i == j) {
+                W[i][j] = 0;
+            } else {
+                if(G->ADJ_MATRIX[get_index(i,j,G->order)] == 0) W[i][j] = INF;
+                else W[i][j] = G->ADJ_MATRIX[get_index(i,j,G->order)];
+            }
+        }
+    }
+
+    int** L = malloc(G->order*sizeof(int*));
+    for(i=0; i < G->order; i++) {
+        L[i] = malloc(G->order*sizeof(int));
+        for(j=0; j < G->order; j++) {
+            L[i][j] = W[i][j];
+        }
+    }
+
+    for(l=1; l < G->order - 1; l*=2) {
+
+        int** L_next = malloc(G->order*sizeof(int*));
+        for(i=0; i < G->order; i++) {
+            L_next[i] = malloc(G->order*sizeof(int));
+            for(j=0; j < G->order; j++) {
+                L_next[i][j] = INF;
+            }
+        }
+
+        for(i=0; i < G->order; i++) {
+            for(j=0; j < G->order; j++) {
+                for(k=0; k < G->order; k++) {
+                    if(INFSUM(L[i][k], L[k][j]) < L_next[i][j]) {
+                        L_next[i][j] = L[i][k] + L[k][j];
+                    }
+                }
+            }
+        }
+
+        for(i=0; i < G->order; i++) {
+            for(j=0; j < G->order; j++) {
+                L[i][j] = L_next[i][j];
+            }
+        }
+    }
+
+    for(i=0; i < G->order; i++) {
+        for(j=0; j < G->order; j++) {
+            d[i][j] = L[i][j];
+        }
+    }
+
+    return true;
+}
